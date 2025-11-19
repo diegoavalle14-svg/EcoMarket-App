@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoMarket - Puntos de Recolección</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Poppins', Arial, sans-serif; background: linear-gradient(135deg,#e8f5e9,#c8e6c9); color:#2e7d32; min-height:100vh; display:flex; flex-direction:column; }
+
+.header { text-align:center; background: linear-gradient(90deg,#165c19,#43a047); color:white; padding:20px; border-radius: 0 0 20px 20px; box-shadow:0 5px 15px rgba(0,0,0,0.25);}
+.header h1 { font-size:3em; font-weight:800; text-shadow:2px 3px 6px rgba(0,0,0,0.25);}
+.header p { margin-top:5px; font-size:1.2em; font-weight:500;}
+.header .btn-back { display:inline-block; margin-top:10px; padding:10px 20px; background:linear-gradient(90deg,#43a047,#66bb6a); color:white; text-decoration:none; font-weight:600; border-radius:14px;}
+.header .btn-back:hover { background:linear-gradient(90deg,#388e3c,#43a047); }
+
+.main-content { flex:1; display:flex; justify-content:center; align-items:center; padding:20px; }
+
+#map { width:90%; height:80vh; border-radius:15px; box-shadow:0 10px 25px rgba(76,175,80,0.3); }
+
+@media(max-width:900px){
+    #map { width:100%; height:70vh; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>EcoMarket</h1>
+    <p>Puntos de Recolección</p>
+    <a class="btn-back" href="/ecomarket">⬅ Volver al Menú Principal</a>
+</div>
+
+<div class="main-content">
+    <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+const API_URL = '/api/puntos_recoleccion'; // API que devuelve los puntos de reciclaje en JSON
+
+// Inicializar mapa centrado en Honduras
+const map = L.map('map').setView([15.0, -86.0], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+
+// Cargar puntos desde API y agregar marcadores
+async function loadPoints(){
+    try{
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        if(!data.puntos) return;
+        data.puntos.forEach(point=>{
+            if(point.lat && point.lng){
+                L.marker([point.lat, point.lng]).addTo(map)
+                 .bindPopup(`<b>${point.nombre}</b><br>${point.direccion}`);
+            }
+        });
+    }catch(err){
+        console.error("Error al cargar los puntos:", err);
+    }
+}
+loadPoints();
+</script>
+
+</body>
+</html>

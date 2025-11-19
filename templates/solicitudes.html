@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Solicitudes EcoMarket</title>
+<style>
+body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg,#e8f5e9,#c8e6c9);
+    margin: 0;
+    color: #2e7d32;
+}
+header {
+    background: #43a047;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+header h1 { margin: 0; font-size: 2em; }
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #c8e6c9;
+}
+th {
+    background: #66bb6a;
+    color: white;
+}
+button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 5px;
+}
+button.aprobar { background: #43a047; }
+button.rechazar { background: #e53935; }
+button.eliminar { background: #757575; }
+button:hover { opacity: 0.85; }
+.status {
+    font-weight: bold;
+}
+.status.pendiente { color: #ff9800; }
+.status.aprobada { color: #4caf50; }
+.status.rechazada { color: #e53935; }
+</style>
+</head>
+<body>
+    
+
+<header style="position: relative;">
+    <h1>Panel de Administración - Solicitudes</h1>
+    <a href="/menu" style="
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #388e3c;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    ">⬅ Volver al menú</a>
+</header>
+
+
+<div class="container">
+    <h2>Solicitudes de Usuarios</h2>
+    <table id="solicitudesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+                <th>Producto</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Filas se cargan con JS -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+
+// Función para cargar solicitudes
+async function cargarSolicitudes() {
+    const tbody = document.querySelector("#solicitudesTable tbody");
+    tbody.innerHTML = "Cargando...";
+    try {
+        const res = await fetch(`${API_BASE}/api/solicitudes`);
+        const data = await res.json();
+        tbody.innerHTML = "";
+
+        data.solicitudes.forEach(s => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${s.id}</td>
+                <td>${s.username}</td>
+                <td>${s.tipo}</td>
+                <td>${s.producto_nombre}</td>
+                <td>${s.descripcion || ""}</td>
+                <td class="status ${s.estado.toLowerCase()}">${s.estado}</td>
+                <td>
+                    <button class="aprobar" onclick="cambiarEstado(${s.id}, 'Aprobada')">Aprobar</button>
+                    <button class="rechazar" onclick="cambiarEstado(${s.id}, 'Rechazada')">Rechazar</button>
+                    <button class="eliminar" onclick="eliminarSolicitud(${s.id})">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch(err) {
+        tbody.innerHTML = `<tr><td colspan="7">Error al cargar solicitudes: ${err.message}</td></tr>`;
+    }
+}
+
+// Función para cambiar estado
+async function cambiarEstado(id, estado) {
+    try {
+        const res = await fetch(`${API_BASE}/api/solicitudes/update_status`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ solicitud_id: id, new_status: estado })
+        });
+        if (!res.ok) throw new Error("No se pudo actualizar el estado");
+        cargarSolicitudes();
+    } catch(err) {
+        alert("Error: " + err.message);
+    }
+}
+
+// Función para eliminar solicitud
+async function eliminarSolicitud(id) {
+    if(!confirm("¿Seguro que deseas eliminar esta solicitud?")) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/solicitudes/delete`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ solicitud_id: id })
+        });
+        if (!res.ok) throw new Error("No se pudo eliminar la solicitud");
+        cargarSolicitudes();
+    } catch(err) {
+        alert("Error: " + err.message);
+    }
+}
+
+// Carga inicial
+cargarSolicitudes();
+</script>
+
+</body>
+</html>

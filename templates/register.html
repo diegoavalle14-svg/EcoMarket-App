@@ -60,12 +60,13 @@ button:hover { background: linear-gradient(90deg,#388e3c,#43a047); transform:sca
 <div id="statusMessage" class="status-message"></div>
 
 <div class="login-link">
-    <p>¿Ya tienes cuenta? <a href="/">Inicia sesión</a></p>
+    <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
 </div>
 </div>
 
 <script>
-const API_BASE = (location.protocol === 'file:') ? 'http://127.0.0.1:8000' : '';
+// Como este HTML lo sirve FastAPI desde el mismo dominio/puerto:
+const API_BASE = '';
 
 function validateForm(form) {
     const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
@@ -119,11 +120,17 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
             body: formData
         });
 
+        if (res.redirected) {
+            // Si FastAPI hace RedirectResponse, el navegador lo sigue:
+            window.location.href = res.url;
+            return;
+        }
+
         if (res.ok) {
             statusMessage.textContent = '¡Registro exitoso! Redirigiendo al login...';
             statusMessage.className='status-message success';
             statusMessage.style.display='block';
-            setTimeout(()=>{ window.location.href='/'; }, 2000);
+            setTimeout(()=>{ window.location.href='/login'; }, 1500);
         } else {
             const json = await res.json().catch(()=>({detail:'Error desconocido'}));
             statusMessage.textContent = json.detail || 'Error desconocido';

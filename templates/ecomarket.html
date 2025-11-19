@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoMarket - Portal</title>
+<style>
+/* ====== ESTILOS ====== */
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Header principal */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #165c19, #43a047);
+    color: white;
+    padding: 25px 30px; /* header más alto */
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+/* Título */
+header h1 { 
+    margin: 0; 
+    font-size: 2em; 
+    font-weight: 800;
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Botones de menú dentro del header */
+nav {
+    display: flex;
+    gap: 15px;
+}
+
+/* Enlaces del menú */
+nav a {
+    text-decoration: none;
+    background: #66bb6a;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: background 0.3s, transform 0.2s;
+}
+
+nav a:hover {
+    background: #43a047;
+    transform: translateY(-2px);
+}
+
+/* Botón de cerrar sesión */
+header a.logout {
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+header a.logout:hover { 
+    text-decoration: underline; 
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+h2 { 
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+
+/* Contenedor de filtros */
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filters select, .filters button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.filters button {
+    background-color: #43a047;
+    color: white;
+    border: none;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.filters button:hover {
+    background-color: #388e3c;
+}
+
+/* Grid de productos */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-card img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.product-card h3 {
+    margin: 5px 0;
+}
+
+.product-card p { 
+    margin: 5px 0; 
+}
+
+button {
+    background: #43a047;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+button:hover { 
+    background: #388e3c; 
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>EcoMarket</h1>
+    <nav>
+        <a href="/puntos_usuario">Puntos de reciclaje ♻️</a>
+        <a href="/solicitudes_usuario">Sistema de solicitudes 📝</a>
+    </nav>
+    <a href="/login" class="logout" id="logoutBtn">Cerrar sesión</a>
+</header>
+
+<div class="container">
+    <h2>Productos disponibles</h2>
+
+<!-- FILTROS -->
+<div class="filters">
+    <select id="filterCategoria">
+        <option value="">Todas las categorías</option>
+        <option value="Ropa">Ropa</option>
+        <option value="Electrónicos">Electrónicos</option>
+        <option value="Muebles">Muebles</option>
+        <option value="Libros">Libros</option>
+        <option value="Otros">Otros</option>
+    </select>
+
+    <select id="filterPrecio">
+        <option value="">Todos los precios</option>
+        <option value="0-10">0 - 10 $</option>
+        <option value="10-50">10 - 50 $</option>
+        <option value="50-100">50 - 100 $</option>
+    </select>
+
+    <button id="applyFilters">Aplicar filtros</button>
+</div>
+
+
+    <div class="products-grid" id="productsGrid">
+        <!-- Productos se cargarán aquí vía JS -->
+    </div>
+</div>
+
+<script>
+const API_BASE = ""; // tu API
+
+// Cerrar sesión
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    document.cookie = "user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "user_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    window.location.href = "/login";
+});
+
+// Cargar productos
+async function cargarProductos() {
+    try {
+        const res = await fetch(`${API_BASE}/api/productos`);
+        if (!res.ok) throw new Error("No se pudieron cargar los productos");
+        const data = await res.json();
+        mostrarProductos(data.productos);
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+function mostrarProductos(productos) {
+    const grid = document.getElementById("productsGrid");
+    grid.innerHTML = "";
+    productos.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+            <img src="${p.image_url || 'https://via.placeholder.com/250'}" alt="${p.name}">
+            <h3>${p.name}</h3>
+            <p><strong>Categoría:</strong> ${p.category}</p>
+            <p><strong>Precio:</strong> $${p.price}</p>
+            <p><strong>Stock:</strong> ${p.stock}</p>
+            <p>${p.description || ''}</p>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+
+// Aplicar filtros
+document.getElementById("applyFilters").addEventListener("click", async () => {
+    const categoria = document.getElementById("filterCategoria").value;
+    const precio = document.getElementById("filterPrecio").value;
+
+    const res = await fetch(`${API_BASE}/api/productos`);
+    const data = await res.json();
+
+    let productosFiltrados = data.productos;
+
+    // Filtrar por categoría
+    if (categoria) {
+        productosFiltrados = productosFiltrados.filter(p => p.category === categoria);
+    }
+
+    // Filtrar por precio
+    if (precio) {
+        const [min, max] = precio.split("-").map(Number);
+        productosFiltrados = productosFiltrados.filter(p => p.price >= min && p.price <= max);
+    }
+
+    mostrarProductos(productosFiltrados);
+});
+
+// Ejecutar al cargar la página
+cargarProductos();
+</script>
+
+</body>
+</html>
