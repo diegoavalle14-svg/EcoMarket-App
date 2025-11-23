@@ -4,87 +4,314 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EcoMarket - Inicio de Sesión</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    font-family: "Poppins", Arial, sans-serif;
-    background: linear-gradient(135deg, #e8f5e9 0%, #6cbb80be 100%);
-    padding: 40px;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
     color: #2e7d32;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
 }
+
+/* HEADER */
 .header {
-    max-width: 600px;
     text-align: center;
-    background: linear-gradient(90deg, #165c19, #9dcf9f);
+    background: linear-gradient(90deg, #165c19, #43a047);
     color: white;
-    padding: 35px;
-    border-radius: 40px;
-    margin: 0 auto 20px auto;
-    margin-top: 20px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    padding: 50px 20px;
+    border-radius: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
-.header h1 { font-size: 5em; font-weight: 800; text-shadow: 1px 2px 3px rgba(0,0,0,0.2); }
-.container {
-    max-width: 400px;
-    margin: 0 auto;
-    background: #ffffff;
-    padding: 35px;
-    border-radius: 25px;
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.15);
-    border: 2px solid #c8e6c9;
+
+.header-title {
+    font-size: 4em;
+    font-weight: 800;
+    text-shadow: 2px 3px 6px rgba(0,0,0,0.25);
 }
+
+.header p {
+    margin-top: 15px;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    background: white;
+    border-radius: 30px;
+    padding: 50px 40px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(76,175,80,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.login-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(76,175,80,0.3);
+}
+
 h2 {
     color: #2e7d32;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     text-align: center;
     font-weight: 800;
-    font-size: 28px;
+    font-size: 2.2em;
 }
-.form-group { margin-bottom: 18px; }
-label { display: block; margin-bottom: 6px; color: #33691e; font-weight: 600; font-size: 14px; }
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: #2e7d32;
+    font-weight: 600;
+    font-size: 15px;
+}
+
 input {
-    width: 100%; padding: 12px; border: 1.5px solid #a5d6a7;
-    border-radius: 8px; font-size: 15px; background-color: #f9fff9;
+    width: 100%;
+    padding: 15px 18px;
+    border: 2px solid #c8e6c9;
+    border-radius: 12px;
+    font-size: 15px;
+    background-color: #f9fff9;
     transition: all 0.3s ease;
 }
+
 input:focus {
-    outline: none; border-color: #43a047; box-shadow: 0 0 6px rgba(67,160,71,0.3);
+    outline: none;
+    border-color: #43a047;
+    box-shadow: 0 0 12px rgba(67,160,71,0.3);
     background-color: #ffffff;
 }
-button {
-    width: 100%; padding: 14px; background: linear-gradient(90deg, #43a047, #4caf50);
-    color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
-    cursor: pointer; margin-top: 12px; transition: background 0.3s, transform 0.2s;
+
+.forgot-password {
+    text-align: right;
+    margin-top: 10px;
 }
-button:hover { background: linear-gradient(90deg, #388e3c, #43a047); transform: scale(1.02); }
-.login-link { text-align: center; margin-top: 20px; font-size: 15px; }
-.login-link a { color: #388e3c; text-decoration: none; font-weight: 600; }
-.login-link a:hover { color: #1b5e20; }
+
+.forgot-password a {
+    color: #43a047;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, #43a047, #66bb6a);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #388e3c, #43a047);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(67,160,71,0.4);
+}
+
+.divider {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: #c8e6c9;
+}
+
+.divider span {
+    background: white;
+    padding: 0 20px;
+    position: relative;
+    color: #66bb6a;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 15px;
+    color: #555;
+}
+
+.register-link a {
+    color: #43a047;
+    font-weight: 600;
+}
+
+/* FOOTER */
+.main-footer {
+    background: linear-gradient(90deg, #165c19, #2e7d32);
+    color: white;
+    padding: 40px 20px;
+    margin-top: 50px;
+    border-radius: 30px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+}
+
+.footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+}
+
+.footer-section h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li a {
+    color: #c8e6c9;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    color: #c8e6c9;
+    font-size: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .header-title { font-size: 3em; }
+}
+
+@media (max-width: 480px) {
+    .header-title { font-size: 2.4em; }
+}
 </style>
 </head>
 <body>
 
-<div class="header"><h1>EcoMarket</h1></div>
+<!-- HEADER -->
+<div class="header">
+    <h1 class="header-title">EcoMarket</h1>
+    <p>Bienvenido a EcoMarket: calidad, conciencia y comodidad.</p>
+</div>
 
-<div class="container">
-    <h2>Iniciar Sesión</h2>
-    <!-- FORMULARIO NORMAL, SIN JS PERSONALIZADO -->
-    <form id="loginForm" action="/login" method="POST">
-        <div class="form-group">
-            <label for="username">Nombre de Usuario:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit">Ingresar</button>
-    </form>
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
 
-    <div class="login-link">
-        <p>¿No tienes cuenta? <a href="/register">Regístrate</a></p>
+        <form id="loginForm" action="/login" method="POST">
+            <div class="form-group">
+                <label for="username">Nombre de Usuario:</label>
+                <input type="text" id="username" name="username" placeholder="Ingresa tu usuario" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+
+            <div class="forgot-password">
+                <a href="/recuperar-password">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <div class="divider"><span>O</span></div>
+
+        <div class="register-link">
+            <p>¿No tienes cuenta? <a href="/register">Regístrate aquí</a></p>
+        </div>
     </div>
 </div>
+
+<!-- FOOTER -->
+<footer class="main-footer">
+    <div class="footer-content">
+
+        <div class="footer-section">
+            <h4>EcoMarket</h4>
+            <ul>
+                <li><a href="#">Nuestra misión</a></li>
+                <li><a href="#">Valores</a></li>
+                <li><a href="#">Sostenibilidad</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Puntos de Recolección</h4>
+            <ul>
+                <li><a href="#">Mapa interactivo</a></li>
+
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Ayuda</h4>
+            <ul>
+                <li><a href="#">Preguntas frecuentes</a></li>
+                <li><a href="#">Políticas</a></li>
+                <li><a href="#">Reportar un problema</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Contacto</h4>
+            <ul>
+                <li><a href="#">Correo</a></li>
+                <li><a href="#">Teléfono</a></li>
+                <li><a href="#">Formulario</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2024 EcoMarket. Todos los derechos reservados. | Diseñado con 💚 para el planeta |</p>
+    </div>
+</footer>
 
 </body>
 </html>

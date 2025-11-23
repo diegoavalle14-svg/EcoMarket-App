@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EcoMarket - Portal</title>
+
 <style>
 /* ====== ESTILOS ====== */
 body {
@@ -11,6 +12,9 @@ body {
     font-family: "Poppins", sans-serif;
     background: #e8f5e9;
     color: #2e7d32;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Header principal */
@@ -20,11 +24,10 @@ header {
     align-items: center;
     background: linear-gradient(90deg, #165c19, #43a047);
     color: white;
-    padding: 25px 30px; /* header más alto */
+    padding: 25px 30px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
-/* Título */
 header h1 { 
     margin: 0; 
     font-size: 2em; 
@@ -32,13 +35,13 @@ header h1 {
     text-shadow: 1px 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Botones de menú dentro del header */
+/* Nav dentro del header */
 nav {
     display: flex;
     gap: 15px;
 }
 
-/* Enlaces del menú */
+/* Botones del menú */
 nav a {
     text-decoration: none;
     background: #66bb6a;
@@ -54,7 +57,7 @@ nav a:hover {
     transform: translateY(-2px);
 }
 
-/* Botón de cerrar sesión */
+/* Botón cerrar sesión */
 header a.logout {
     color: white;
     font-weight: 600;
@@ -62,33 +65,38 @@ header a.logout {
     margin-left: 20px;
 }
 
-header a.logout:hover { 
-    text-decoration: underline; 
+header a.logout:hover {
+    text-decoration: underline;
 }
 
-/* Contenedor principal */
+/* ===== Body ===== */
+main {
+    flex: 1;
+}
+
 .container {
     max-width: 1200px;
     margin: auto;
-    padding: 20px;
+    padding: 30px 20px;
 }
 
 h2 { 
     text-align: center; 
     margin-bottom: 20px; 
+    font-size: 2rem;
 }
 
-/* Contenedor de filtros */
+/* Filtros */
 .filters {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     flex-wrap: wrap;
     justify-content: center;
 }
 
 .filters select, .filters button {
-    padding: 10px 15px;
+    padding: 12px 15px;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 1em;
@@ -107,11 +115,12 @@ h2 {
     background-color: #388e3c;
 }
 
-/* Grid de productos */
+/* Grid productos */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
+    padding-bottom: 40px;
 }
 
 .product-card {
@@ -134,10 +143,6 @@ h2 {
     margin: 5px 0;
 }
 
-.product-card p { 
-    margin: 5px 0; 
-}
-
 button {
     background: #43a047;
     color: white;
@@ -152,56 +157,85 @@ button {
 button:hover { 
     background: #388e3c; 
 }
+
+/* ====== FOOTER PROFESIONAL ====== */
+footer {
+    background: #165c19;
+    color: white;
+    text-align: center;
+    padding: 18px 10px;
+    margin-top: auto;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+}
+
+footer a {
+    color: #a5d6a7;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
 </style>
 </head>
+
 <body>
 
 <header>
     <h1>EcoMarket</h1>
     <nav>
-        <a href="/puntos_usuario">Puntos de reciclaje ♻️</a>
-        <a href="/solicitudes_usuario">Sistema de solicitudes 📝</a>
+        <a href="/puntos_usuario">Puntos de reciclaje </a>
+        <a href="/solicitudes_usuario">Sistema de solicitudes </a>
     </nav>
     <a href="/login" class="logout" id="logoutBtn">Cerrar sesión</a>
 </header>
 
-<div class="container">
-    <h2>Productos disponibles</h2>
+<main>
+    <div class="container">
+        <h2>Productos disponibles</h2>
 
-<!-- FILTROS -->
-<div class="filters">
-    <select id="filterCategoria">
-        <option value="">Todas las categorías</option>
-        <option value="Ropa">Ropa</option>
-        <option value="Electrónicos">Electrónicos</option>
-        <option value="Muebles">Muebles</option>
-        <option value="Libros">Libros</option>
-        <option value="Otros">Otros</option>
-    </select>
+        <!-- FILTROS -->
+        <div class="filters">
+            <select id="filterCategoria">
+                <option value="">Todas las categorías</option>
+                <option value="Ropa">Ropa</option>
+                <option value="Electrónicos">Electrónicos</option>
+                <option value="Muebles">Muebles</option>
+                <option value="Libros">Libros</option>
+                <option value="Otros">Otros</option>
+            </select>
 
-    <select id="filterPrecio">
-        <option value="">Todos los precios</option>
-        <option value="0-10">0 - 10 $</option>
-        <option value="10-50">10 - 50 $</option>
-        <option value="50-100">50 - 100 $</option>
-    </select>
+            <select id="filterPrecio">
+                <option value="">Todos los precios</option>
+                <option value="0-10">0 - 10 $</option>
+                <option value="10-50">10 - 50 $</option>
+                <option value="50-100">50 - 100 $</option>
+            </select>
 
-    <button id="applyFilters">Aplicar filtros</button>
-</div>
+            <button id="applyFilters">Aplicar filtros</button>
+        </div>
 
-
-    <div class="products-grid" id="productsGrid">
-        <!-- Productos se cargarán aquí vía JS -->
+        <!-- Productos -->
+        <div class="products-grid" id="productsGrid"></div>
     </div>
-</div>
+</main>
+
+<footer>
+    © 2025 EcoMarket — Plataforma ecológica de intercambio y reciclaje •  
+    <a href="#">Políticas</a> • <a href="#">Soporte</a>
+</footer>
+
 
 <script>
-const API_BASE = ""; // tu API
+const API_BASE = "";
 
 // Cerrar sesión
 document.getElementById("logoutBtn").addEventListener("click", () => {
-    document.cookie = "user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "user_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "user_role=; expires=Thu, 01 Jan 1970; path=/;";
+    document.cookie = "user_name=; expires=Thu, 01 Jan 1970; path=/;";
     window.location.href = "/login";
 });
 
@@ -235,8 +269,7 @@ function mostrarProductos(productos) {
     });
 }
 
-
-// Aplicar filtros
+// Filtros
 document.getElementById("applyFilters").addEventListener("click", async () => {
     const categoria = document.getElementById("filterCategoria").value;
     const precio = document.getElementById("filterPrecio").value;
@@ -246,12 +279,8 @@ document.getElementById("applyFilters").addEventListener("click", async () => {
 
     let productosFiltrados = data.productos;
 
-    // Filtrar por categoría
-    if (categoria) {
-        productosFiltrados = productosFiltrados.filter(p => p.category === categoria);
-    }
+    if (categoria) productosFiltrados = productosFiltrados.filter(p => p.category === categoria);
 
-    // Filtrar por precio
     if (precio) {
         const [min, max] = precio.split("-").map(Number);
         productosFiltrados = productosFiltrados.filter(p => p.price >= min && p.price <= max);
@@ -260,7 +289,6 @@ document.getElementById("applyFilters").addEventListener("click", async () => {
     mostrarProductos(productosFiltrados);
 });
 
-// Ejecutar al cargar la página
 cargarProductos();
 </script>
 
