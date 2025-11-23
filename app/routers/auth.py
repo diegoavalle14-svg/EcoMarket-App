@@ -15,26 +15,25 @@ async def register_page(request: Request):
 
 @router.post("/register")
 async def register_user(
-    first_name: str = Form(...),
-    last_name: str = Form(...),
+    nombre_completo: str = Form(...),
     username: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
     role: str = Form("user")
 ):
-    existing_user = await database.fetch_one(users.select().where(users.c.username == username))
-    existing_email = await database.fetch_one(users.select().where(users.c.email == email))
+    existing_user = await database.fetch_one(users.select().where(users.c.usuario == username))
+    existing_email = await database.fetch_one(users.select().where(users.c.correo == email))
     if existing_user:
         raise HTTPException(status_code=400, detail="Usuario ya existe")
     if existing_email:
         raise HTTPException(status_code=400, detail="Correo ya registrado")
+
     query = users.insert().values(
-        first_name=first_name.strip(),
-        last_name=last_name.strip(),
-        username=username.strip(),
-        email=email.strip(),
-        password=hash_password(password),
-        role=role
+        nombre_completo=nombre_completo.strip(),
+        usuario=username.strip(),
+        correo=email.strip(),
+        contrasena=hash_password(password),
+        rol=role
     )
     await database.execute(query)
     return RedirectResponse("/login", status_code=303)
@@ -46,14 +45,14 @@ async def login_page(request: Request):
 
 @router.post("/login")
 async def login(username: str = Form(...), password: str = Form(...)):
-    user = await database.fetch_one(users.select().where(users.c.username == username))
-    if not user or not verify_password(password, user["password"]):
+    user = await database.fetch_one(users.select().where(users.c.usuario == username))
+    if not user or not verify_password(password, user["contrasena"]):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-    redirect_url = "/menu" if user["role"] == "admin" else "/productos_usuario"
+    redirect_url = "/menu" if user["rol"] == "admin" else "/productos_usuario"
     response = RedirectResponse(redirect_url, status_code=302)
-    response.set_cookie("user_name", user["username"], path="/")
-    response.set_cookie("user_role", user["role"], path="/")
+    response.set_cookie("user_name", user["usuario"], path="/")
+    response.set_cookie("user_role", user["rol"], path="/")
     return response
 
 # ---- Logout ----
@@ -69,7 +68,7 @@ async def get_current_user(request: Request):
     username = request.cookies.get("user_name")
     if not username:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No autenticado")
-    user = await database.fetch_one(users.select().where(users.c.username == username))
+    user = await database.fetch_one(users.select().where(users.c.usuario == username))
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario no encontrado")
     return dict(user)

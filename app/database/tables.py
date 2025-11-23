@@ -7,12 +7,11 @@ users = Table(
     "users",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("first_name", String(50)),
-    Column("last_name", String(50)),
-    Column("username", String(50), unique=True),
-    Column("email", String(100), unique=True),
-    Column("password", String(255)),
-    Column("role", String(20), default="user"),
+    Column("nombre_completo", String(150), nullable=False),
+    Column("usuario", String(50), unique=True),
+    Column("correo", String(100), unique=True),
+    Column("contrasena", String(255)),
+    Column("rol", String(20), default="user"),
 )
 
 products = Table(
