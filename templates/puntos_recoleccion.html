@@ -102,7 +102,7 @@ input:focus { outline:none; border-color:#43a047; }
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-const API_URL = '/api/points'; // Tu API real
+const API_URL = '/api/puntos'; // 🔴 Aquí apuntamos correctamente a la ruta del backend
 let editMode = false;
 
 // Inicializar mapa
@@ -143,9 +143,16 @@ document.getElementById('point-form').addEventListener('submit', async (e)=>{
         if(editMode){ url=`${API_URL}/${id}`; method='PUT'; }
 
         const res = await fetch(url, { method, body: formData });
-        if(res.ok){ alert(editMode?'Punto actualizado':'Punto agregado'); location.reload(); }
-        else { const data = await res.json(); alert(data.detail || 'Error al guardar'); }
-    }catch(err){ alert('Error en la conexión'); }
+        if(res.ok){ 
+            alert(editMode ? 'Punto actualizado' : 'Punto agregado'); 
+            location.reload(); 
+        } else { 
+            const data = await res.json(); 
+            alert(data.detail || 'Error al guardar'); 
+        }
+    } catch(err){ 
+        alert('Error en la conexión'); 
+    }
 });
 
 // Cancelar edición
@@ -154,6 +161,3 @@ document.getElementById('cancel-btn').addEventListener('click', ()=>{
     editMode=false;
 });
 </script>
-
-</body>
-</html>

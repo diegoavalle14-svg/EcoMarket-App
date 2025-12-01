@@ -1,404 +1,51 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EcoMarket - Productos</title>
-<style>
-/* ======== General ======== */
-body {
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg, #e8f5e9 0%, #6cbb80be 100%);
-    padding: 30px;
-    color: #2e7d32;
-    margin: 0;
-}
-h1 {
-    text-align: center;
-    font-size: 2.5em;
-    font-weight: 800;
-    margin-bottom: 20px;
-}
-.container {
-    max-width: 950px;
-    margin: auto;
-}
+{% extends "base.html" %}
 
-/* ======== Caja de productos ======== */
-.products-box {
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-}
-.products-box h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.8em;
-    color: #2e7d32;
-}
-.product-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    border-bottom: 1px solid #c8e6c9;
-    padding: 12px 0;
-}
-.product-item img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 1px solid #c8e6c9;
-}
-.product-info {
-    display: flex;
-    flex-direction: column;
-}
-.product-info strong {
-    font-size: 1.1em;
-    margin-bottom: 5px;
-}
-.status {
-    font-weight: 600;
-    color: #388e3c;
-}
+{% block title %}Productos - EcoMarket{% endblock %}
 
-/* Botones editar/eliminar */
-.product-actions {
-    margin-top: 5px;
-}
-.product-actions button {
-    margin-right: 5px;
-    padding: 5px 10px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-}
-.edit-btn {
-    background: #ffa726; color: white;
-}
-.edit-btn:hover { background: #fb8c00; }
-.delete-btn {
-    background: #ef5350; color: white;
-}
-.delete-btn:hover { background: #e53935; }
+{% block content %}
 
-/* ======== Caja del formulario ======== */
-.form-box {
-    background: #f9f9f9;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-.form-box h2 {
-    margin-bottom: 20px;
-    color: #2e7d32;
-    font-size: 1.8em;
-    text-align: center;
-}
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-}
-.form-group label {
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #388e3c;
-}
-.form-group input,
-.form-group textarea,
-.form-group select {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #c8e6c9;
-    font-size: 15px;
-    background-color: #ffffff;
-    font-family: inherit;
-}
+<div class="products-page-container">
 
-/* Filas de inputs (dos por fila) */
-.form-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-/* Botón */
-button[type="submit"], #filterBtn {
-    width: 100%;
-    padding: 12px 0;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(90deg, #43a047, #4caf50);
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
-button[type="submit"]:hover, #filterBtn:hover {
-    background: linear-gradient(90deg, #388e3c, #43a047);
-}
-
-/* Mensajes de estado */
-.status-message {
-    text-align: center;
-    margin-top: 12px;
-    font-weight: bold;
-    color: #2e7d32;
-}
-
-/* Barra de filtro */
-.filter-bar {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-select, button {
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 1px solid #a5d6a7;
-    font-size: 15px;
-    background-color: #f1fff1;
-}
-
-/* Enlaces */
-a {
-    color: #388e3c;
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
-}
-</style>
-</head>
-<body>
-
-<h1>Productos EcoMarket</h1>
-
-<div class="container">
-
-    <!-- FILTRO -->
-    <div class="filter-bar">
-        <div>
-            <label for="category">Categoría:</label>
-            <select id="category">
+    <!-- Panel de filtros -->
+    <div class="filters-panel">
+        <h3>Filtrar Productos</h3>
+        <form method="get" action="/products">
+            <label for="category">Categoría</label>
+            <select name="category" id="category">
                 <option value="">Todas</option>
-                <option value="ropa">Ropa</option>
-                <option value="electronicos">Electrónicos</option>
-                <option value="muebles">Muebles</option>
-                <option value="libros">Libros</option>
-                <option value="otros">Otros</option>
+                <option value="Plásticos" {% if category == 'Plásticos' %}selected{% endif %}>Plásticos</option>
+                <option value="Vidrio" {% if category == 'Vidrio' %}selected{% endif %}>Vidrio</option>
+                <option value="Papel" {% if category == 'Papel' %}selected{% endif %}>Papel</option>
+                <option value="Metales" {% if category == 'Metales' %}selected{% endif %}>Metales</option>
+                <option value="Electrónicos" {% if category == 'Electrónicos' %}selected{% endif %}>Electrónicos</option>
             </select>
-            <button id="filterBtn">Filtrar</button>
-        </div>
-        <a href="/menu">⬅ Volver al menú</a>
-    </div>
-
-    <!-- CAJA DE PRODUCTOS -->
-    <div class="products-box" id="productsBox">
-        <h2>Productos Disponibles</h2>
-        <div id="productsList"></div>
-        <div class="status-message" id="statusMessage"></div>
-    </div>
-
-    <!-- CAJA DEL FORMULARIO -->
-    <div class="form-box">
-        <h2>Agregar/Editar producto</h2>
-        <form id="productForm">
-            <div class="form-group">
-                <label for="name">Nombre:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="description">Descripción:</label>
-                <textarea id="description" name="description" rows="3"></textarea>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="formCategory">Categoría:</label>
-                    <select id="formCategory" name="category" required>
-                        <option value="">Seleccione...</option>
-                        <option value="ropa">Ropa</option>
-                        <option value="electronicos">Electrónicos</option>
-                        <option value="muebles">Muebles</option>
-                        <option value="libros">Libros</option>
-                        <option value="otros">Otros</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="price">Precio:</label>
-                    <input type="number" step="0.01" id="price" name="price" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="stock">Stock:</label>
-                    <input type="number" id="stock" name="stock" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="status">Estado:</label>
-                    <select id="status" name="status">
-                        <option value="disponible">Disponible</option>
-                        <option value="no_disponible">No disponible</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="image_url">URL de Imagen:</label>
-                <input type="url" id="image_url" name="image_url">
-            </div>
-
-            <input type="hidden" id="owner_id" value="1">
-
-            <button type="submit">Guardar producto</button>
+            <button type="submit">Filtrar</button>
         </form>
-        <div class="status-message" id="formMessage"></div>
+    </div>
+
+    <!-- Botón regresar flotante -->
+    <div class="back-button-container">
+        <a href="/" class="btn btn-back">Regresar</a>
+    </div>
+
+
+    <!-- Grid de productos -->
+    <div class="products-grid">
+        {% if products %}
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image_url or '/static/default.png' }}" alt="{{ product.name }}">
+                <h4>{{ product.name }}</h4>
+                <p>{{ product.description or 'Sin descripción' }}</p>
+                <p><b>Precio:</b> L. {{ product.price }}</p>
+                <p><b>Stock:</b> {{ product.stock }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-products-msg">No se han agregado productos en esta categoría.</p>
+        {% endif %}
     </div>
 
 </div>
 
-<script>
-const API_BASE = "http://127.0.0.1:8000";
-
-// ===== Cargar productos =====
-async function cargarProductos(categoria="") {
-    const status = document.getElementById("statusMessage");
-    const container = document.getElementById("productsList");
-    container.innerHTML = "";
-    status.textContent = "Cargando productos...";
-    try {
-        const url = categoria ? `${API_BASE}/products?category=${encodeURIComponent(categoria)}` : `${API_BASE}/products`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Error en la respuesta del servidor");
-        const data = await res.json();
-        if (data.length === 0) { status.textContent = "No hay productos para mostrar."; return; }
-
-        data.forEach(p => {
-            const div = document.createElement("div");
-            div.classList.add("product-item");
-            const imgSrc = p.image_url ? p.image_url : "https://via.placeholder.com/80";
-            div.innerHTML = `
-                <img src="${imgSrc}" alt="${p.name}">
-                <div class="product-info">
-                    <strong>${p.name}</strong>
-                    <span>${p.description||""}</span>
-                    <span>Categoría: ${p.category||""}</span>
-                    <span class="status">Estado: ${p.status||"disponible"}</span>
-                    <div class="product-actions">
-                        <button class="edit-btn" data-id="${p.id}">Editar</button>
-                        <button class="delete-btn" data-id="${p.id}">Eliminar</button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-        status.textContent = "";
-    } catch (err) {
-        status.textContent = "Error al cargar los productos: " + err.message;
-    }
-}
-
-// ===== Filtrar =====
-document.getElementById("filterBtn").addEventListener("click", () => {
-    const cat = document.getElementById("category").value;
-    cargarProductos(cat);
-});
-
-// ===== Crear/Editar producto =====
-document.getElementById("productForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formMessage = document.getElementById("formMessage");
-    formMessage.textContent = "Guardando producto...";
-
-    const productoData = {
-        name: document.getElementById("name").value,
-        description: document.getElementById("description").value || null,
-        category: document.getElementById("formCategory").value,
-        price: parseFloat(document.getElementById("price").value),
-        stock: parseInt(document.getElementById("stock").value),
-        status: document.getElementById("status").value,
-        image_url: document.getElementById("image_url").value || null,
-        owner_id: parseInt(document.getElementById("owner_id").value)
-    };
-
-    const editId = e.target.dataset.editId;
-    const method = editId ? "PUT" : "POST";
-    const url = editId ? `${API_BASE}/products/${editId}` : `${API_BASE}/products`;
-
-    try {
-        const res = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(productoData)
-        });
-        if(!res.ok) {
-            const errorData = await res.json().catch(()=>({}));
-            throw new Error(errorData.detail || "Error al guardar producto");
-        }
-
-        formMessage.textContent = editId ? "Producto actualizado correctamente." : "Producto agregado correctamente.";
-        e.target.reset();
-        delete e.target.dataset.editId;
-        document.getElementById("status").value = "disponible";
-        cargarProductos(document.getElementById("category").value);
-    } catch(err){
-        formMessage.textContent = "Error: " + err.message;
-    }
-});
-
-// ===== Editar y eliminar productos =====
-document.getElementById("productsList").addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-    if(e.target.classList.contains("delete-btn")){
-        if(confirm("¿Desea eliminar este producto?")){
-            try {
-                const res = await fetch(`${API_BASE}/products/${id}`, { method: "DELETE" });
-                if(!res.ok) throw new Error("Error al eliminar producto");
-                cargarProductos(document.getElementById("category").value);
-            } catch(err){
-                alert(err.message);
-            }
-        }
-    }
-
-    if(e.target.classList.contains("edit-btn")){
-        try {
-            const res = await fetch(`${API_BASE}/products/${id}`);
-            if(!res.ok) throw new Error("Error al obtener producto");
-            const p = await res.json();
-            document.getElementById("name").value = p.name;
-            document.getElementById("description").value = p.description || "";
-            document.getElementById("formCategory").value = p.category;
-            document.getElementById("price").value = p.price;
-            document.getElementById("stock").value = p.stock;
-            document.getElementById("status").value = p.status;
-            document.getElementById("image_url").value = p.image_url || "";
-            document.getElementById("owner_id").value = p.owner_id;
-            document.getElementById("productForm").dataset.editId = id;
-        } catch(err){
-            alert(err.message);
-        }
-    }
-});
-
-// ===== Carga inicial =====
-cargarProductos();
-</script>
-
-</body>
-</html>
+{% endblock %}

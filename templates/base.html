@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EcoMarket{% endblock %}</title>
+
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="container-header">
+        <!-- Logo / Nombre -->
+        <div class="logo">
+            <a href="/">EcoMarket</a>
+        </div>
+
+        <!-- Botones centrales -->
+        <nav class="nav-center">
+            <ul class="nav-list">
+                <li>
+                    <a href="/puntos-recoleccion" class="btn">Puntos de Recolección</a>
+                </li>
+                <li>
+                    <a href="/solicitudes" class="btn secondary">Sistema de Solicitudes</a>
+                </li>
+                <li>
+                    <a href="/recompensas" class="btn nav-recompensas">
+                        <b><span class="nav-recompensas-label"> Mis recompensas </span></b>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Botones derecha -->
+        <div class="nav-right">
+            {% if user %}
+                <span style="color: white; margin-right: 15px;"></span>
+                <a href="/auth/logout" class="btn logout-btn">Cerrar Sesión</a>
+            {% else %}
+                <a href="/auth/login" class="btn">Iniciar Sesión</a>
+                <a href="/auth/register" class="btn secondary">Registrarse</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+
+<main class="main-content">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer class="main-footer">
+    <p>&copy; 2025 EcoMarket. Todos los derechos reservados.</p>
+</footer>
+
+</body>
+</html>

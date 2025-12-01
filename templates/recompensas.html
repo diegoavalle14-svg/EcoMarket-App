@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="solicitudes-layout">
+  <div class="solicitudes-header">
+    <div>
+      <div class="solicitudes-title">
+        <div class="solicitudes-title-icon">★</div>
+        <span>Mis recompensas</span>
+      </div>
+      <p class="solicitudes-subtitle">
+        Revisa tu saldo de puntos, tu historial y canjea recompensas disponibles.
+      </p>
+    </div>
+  </div>
+
+  <div id="msgRecompensas" class="alert" style="display:none;"></div>
+
+  <div class="solicitudes-content" style="display:grid;grid-template-columns:1.2fr 1.8fr;gap:20px;">
+    <!-- Tarjeta saldo e historial -->
+    <div class="card-table" style="min-height:200px;">
+      <div class="card-table-header">
+        <h2>Mi saldo de puntos</h2>
+      </div>
+      <div style="padding:10px 0 5px;">
+        <span style="font-size:2rem;font-weight:700;color:#2e7d32;" id="lblSaldo">0</span>
+        <span style="margin-left:5px;color:#78909c;">puntos</span>
+      </div>
+
+      <h3 style="margin-top:15px;font-size:1rem;color:#2e7d32;">Historial reciente</h3>
+      <div class="table-scroll" style="max-height:260px;overflow-y:auto;">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Cambio</th>
+              <th>Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="tablaHistorial">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tarjeta catálogo -->
+    <div class="card-table">
+      <div class="card-table-header">
+        <h2>Catálogo de recompensas</h2>
+        <span>Canjea tus puntos por beneficios</span>
+      </div>
+
+      <div class="table-scroll">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Recompensa</th>
+              <th>Puntos</th>
+              <th>Descripción</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaRewards"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const msgBox = document.getElementById("msgRecompensas");
+const saldoEl = document.getElementById("lblSaldo");
+const tablaHistorial = document.getElementById("tablaHistorial");
+const tablaRewards = document.getElementById("tablaRewards");
+
+function mostrarMensajeRecompensas(texto, esError = false) {
+  msgBox.style.display = "block";
+  msgBox.className = "alert " + (esError ? "alert-error" : "alert-success");
+  msgBox.textContent = texto;
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[m]));
+}
+
+function formatoFecha(fechaStr) {
+  if (!fechaStr) return "";
+  const d = new Date(fechaStr);
+  if (isNaN(d)) return fechaStr;
+  return d.toLocaleString();
+}
+
+async function cargarRecompensasUsuario() {
+  const res = await fetch("/recompensas/mis-datos");
+  if (!res.ok) {
+    mostrarMensajeRecompensas("No se pudieron cargar tus recompensas (status " + res.status + ").", true);
+    return;
+  }
+
+  const data = await res.json();
+  saldoEl.textContent = data.balance ?? 0;
+
+  // Historial
+  if (!data.historial || !data.historial.length) {
+    tablaHistorial.innerHTML = `<tr><td colspan="3" style="padding:8px;color:#666;">Sin movimientos aún.</td></tr>`;
+  } else {
+    tablaHistorial.innerHTML = data.historial.map(h => `
+      <tr>
+        <td>${formatoFecha(h.fecha)}</td>
+        <td style="font-weight:600;color:${h.cambio >= 0 ? '#2e7d32' : '#c62828'};">
+          ${h.cambio > 0 ? '+' : ''}${h.cambio}
+        </td>
+        <td>${escapeHtml(h.motivo)}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Catálogo
+  if (!data.rewards || !data.rewards.length) {
+    tablaRewards.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#666;">No hay recompensas disponibles por ahora.</td></tr>`;
+  } else {
+    tablaRewards.innerHTML = data.rewards.map(r => `
+      <tr>
+        <td>${escapeHtml(r.nombre)}</td>
+        <td>${r.puntos_necesarios}</td>
+        <td>${escapeHtml(r.descripcion || '')}</td>
+        <td>
+          <button class="btn-chip btn-chip-approve" onclick="canjear(${r.id}, ${r.puntos_necesarios})">
+            Canjear
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+}
+
+async function canjear(id, puntos) {
+  if (!confirm("¿Canjear esta recompensa por " + puntos + " puntos?")) return;
+
+  const res = await fetch(`/recompensas/canjear/${id}`, { method: "POST" });
+  if (res.ok) {
+    const data = await res.json().catch(() => null);
+    mostrarMensajeRecompensas("Canje realizado correctamente.");
+    if (data && typeof data.nuevo_balance === "number") {
+      saldoEl.textContent = data.nuevo_balance;
+    }
+    await cargarRecompensasUsuario();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMensajeRecompensas("No se pudo canjear la recompensa: " + (txt || `status ${res.status}`), true);
+  }
+}
+
+cargarRecompensasUsuario();
+</script>
+
+{% endblock %}

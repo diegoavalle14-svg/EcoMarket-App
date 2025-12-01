@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Solicitudes</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --verde: #2ecc71;
+    --verde-oscuro: #27ae60;
+    --gris-claro: #ecf0f1;
+    --gris: #2c3e50;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background:#f5f8f5;
+    color:#2e7d32;
+}
+
+/* Header */
+.header {
+    text-align:center;
+    background: linear-gradient(90deg,#165c19,#43a047);
+    color:white;
+    padding:40px 20px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    margin-bottom:30px;
+}
+.header h1 { font-size:3rem; margin-bottom:5px; }
+.header p  { font-size:1.1rem; }
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    padding: 0 20px;
+}
+
+/* Mensajes */
+.alert {
+    margin: 0 0 18px 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    display: none;
+}
+.alert-success {
+    background:#e8f5e9;
+    color:#1b5e20;
+    border:1px solid #c8e6c9;
+}
+.alert-error {
+    background:#ffebee;
+    color:#b71c1c;
+    border:1px solid #ffcdd2;
+}
+
+/* Tarjeta tabla */
+.card-table {
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    border:1px solid #e0f2f1;
+}
+
+.card-table-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+.card-table-header h2 {
+    margin:0;
+    font-size:1.4rem;
+    color:#2e7d32;
+}
+.card-table-header span {
+    font-size:0.9rem;
+    color:#78909c;
+}
+
+/* Tabla */
+.table-scroll { overflow-x:auto; }
+
+.table-modern {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+}
+.table-modern thead tr {
+    background:#f1f8e9;
+}
+.table-modern th,
+.table-modern td {
+    padding:8px 10px;
+    border-bottom:1px solid #eceff1;
+    text-align:left;
+    white-space:nowrap;
+}
+.table-modern tbody tr:hover {
+    background:#f9fbe7;
+}
+
+/* Chips de estado */
+.status-chip {
+    display:inline-flex;
+    align-items:center;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:600;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+}
+.status-pendiente {
+    background:#fff8e1;
+    color:#ff8f00;
+    border:1px solid #ffe082;
+}
+.status-aprobado {
+    background:#e8f5e9;
+    color:#2e7d32;
+    border:1px solid #c8e6c9;
+}
+.status-rechazado {
+    background:#ffebee;
+    color:#c62828;
+    border:1px solid #ffcdd2;
+}
+
+/* Botones acción */
+.btn-chip {
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:0.8rem;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
+}
+.btn-chip-approve {
+    background:#c8e6c9;
+    color:#1b5e20;
+}
+.btn-chip-approve:hover {
+    background:#a5d6a7;
+    transform:translateY(-1px);
+}
+.btn-chip-reject {
+    background:#ffcdd2;
+    color:#b71c1c;
+}
+.btn-chip-reject:hover {
+    background:#ef9a9a;
+    transform:translateY(-1px);
+}
+
+/* Botón volver */
+.btn-back {
+    display:inline-block;
+    margin-top:16px;
+    padding:10px 18px;
+    border-radius:8px;
+    background:var(--gris-claro);
+    color:var(--gris);
+    text-decoration:none;
+    font-weight:500;
+}
+.btn-back:hover {
+    background:#bdc3c7;
+}
+
+@media(max-width:900px){
+    .card-table-header {
+        flex-direction:column;
+        align-items:flex-start;
+        gap:4px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Admin - Solicitudes</h1>
+  <p>Revisa, aprueba o rechaza las solicitudes de los usuarios de EcoMarket</p>
+</div>
+
+<div class="admin-container">
+
+  <div id="mensajeAdmin" class="alert alert-success"></div>
+
+  <div class="card-table">
+    <div class="card-table-header">
+      <h2>Solicitudes recibidas</h2>
+    </div>
+
+    <div class="table-scroll">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaAdmin"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="/menu" class="btn-back">⬅ Volver al menú</a>
+</div>
+
+<script>
+const msgBoxAdmin = document.getElementById("mensajeAdmin");
+
+function mostrarMensajeAdmin(texto, esError = false) {
+  msgBoxAdmin.style.display = "block";
+  msgBoxAdmin.classList.toggle("alert-success", !esError);
+  msgBoxAdmin.classList.toggle("alert-error", esError);
+  msgBoxAdmin.textContent = texto;
+}
+
+function estadoChip(estadoRaw) {
+  const e = (estadoRaw || "pendiente").toLowerCase();
+  let cls = "status-pendiente";
+  if (e === "aprobado") cls = "status-aprobado";
+  if (e === "rechazado") cls = "status-rechazado";
+  return `<span class="status-chip ${cls}">${e.toUpperCase()}</span>`;
+}
+
+async function cargarAdmin() {
+  const res = await fetch("/solicitudes/admin/all");
+  const tbody = document.getElementById("tablaAdmin");
+
+  if (!res.ok) {
+    tbody.innerHTML = `<tr><td colspan="8" style="color:#c00;padding:10px;">Error ${res.status}</td></tr>`;
+    mostrarMensajeAdmin("No se pudieron cargar las solicitudes (status " + res.status + ").", true);
+    return;
+  }
+
+  const data = await res.json();
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="color:#666;padding:10px;">No hay solicitudes.</td></tr>`;
+    mostrarMensajeAdmin("No hay solicitudes registradas aún.");
+    return;
+  }
+
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td>${s.id}</td>
+      <td>${escapeHtml(s.email)}</td>
+      <td>${escapeHtml(s.producto)}</td>
+      <td>${s.cantidad}</td>
+      <td>${escapeHtml(s.descripcion || '')}</td>
+      <td>${escapeHtml(s.tipo || '')}</td>
+      <td>${estadoChip(s.estado)}</td>
+      <td>
+        <button class="btn-chip btn-chip-approve" onclick="cambiarEstado(${s.id},'aprobado')">Aprobar</button>
+        <button class="btn-chip btn-chip-reject" onclick="cambiarEstado(${s.id},'rechazado')">Rechazar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function cambiarEstado(id, estado) {
+  const res = await fetch(`/solicitudes/admin/estado/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ estado }),
+  });
+
+  if (res.ok) {
+    const data = await res.json().catch(() => null);
+    const nuevo = data?.nuevo_estado || estado;
+    mostrarMensajeAdmin(`Solicitud ${id} actualizada a ${String(nuevo).toUpperCase()}.`);
+    await cargarAdmin();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMensajeAdmin("Error al actualizar solicitud " + id + ": " + (txt || `status ${res.status}`), true);
+  }
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[m]));
+}
+
+cargarAdmin();
+</script>
+
+</body>
+</html>

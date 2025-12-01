@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Recompensas</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --verde: #2ecc71;
+    --verde-oscuro: #27ae60;
+    --gris-claro: #ecf0f1;
+    --gris: #2c3e50;
+}
+* { box-sizing:border-box; }
+body {
+    font-family:'Poppins',sans-serif;
+    margin:0;
+    padding:0;
+    background:#f5f8f5;
+    color:#2e7d32;
+}
+.header {
+    text-align:center;
+    background: linear-gradient(90deg,#165c19,#43a047);
+    color:white;
+    padding:40px 20px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    margin-bottom:30px;
+}
+.header h1 { font-size:3rem; margin-bottom:5px; }
+.header p  { font-size:1.1rem; }
+
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    padding: 0 20px;
+    display:grid;
+    grid-template-columns:2fr 1.4fr;
+    gap:20px;
+}
+
+.alert {
+    margin: 0 0 18px 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    display: none;
+}
+.alert-success {
+    background:#e8f5e9;
+    color:#1b5e20;
+    border:1px solid #c8e6c9;
+}
+.alert-error {
+    background:#ffebee;
+    color:#b71c1c;
+    border:1px solid #ffcdd2;
+}
+
+.card-table, .card-form {
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    border:1px solid #e0f2f1;
+}
+.card-table-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+.card-table-header h2 {
+    margin:0;
+    font-size:1.4rem;
+    color:#2e7d32;
+}
+.card-table-header span {
+    font-size:0.9rem;
+    color:#78909c;
+}
+
+.table-scroll { overflow-x:auto; }
+.table-modern {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+}
+.table-modern thead tr {
+    background:#f1f8e9;
+}
+.table-modern th,
+.table-modern td {
+    padding:8px 10px;
+    border-bottom:1px solid #eceff1;
+    text-align:left;
+    white-space:nowrap;
+}
+.table-modern tbody tr:hover {
+    background:#f9fbe7;
+}
+
+/* Botones */
+.btn-chip {
+    padding:4px 9px;
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
+}
+.btn-edit {
+    background:#c8e6c9;
+    color:#1b5e20;
+}
+.btn-edit:hover {
+    background:#a5d6a7;
+    transform:translateY(-1px);
+}
+.btn-delete {
+    background:#ffcdd2;
+    color:#b71c1c;
+}
+.btn-delete:hover {
+    background:#ef9a9a;
+    transform:translateY(-1px);
+}
+
+.card-form h2 { margin-top:0; font-size:1.3rem; color:#2e7d32; }
+.form-grid {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+}
+.form-group label {
+    font-size:0.85rem;
+    color:#546e7a;
+    display:block;
+    margin-bottom:3px;
+}
+.form-group input, .form-group textarea {
+    width:100%;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #cfd8dc;
+    font-family:'Poppins',sans-serif;
+    font-size:0.9rem;
+}
+.form-group textarea {
+    resize:vertical;
+    min-height:70px;
+}
+.form-check {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.85rem;
+    color:#546e7a;
+}
+.form-buttons {
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:12px;
+}
+.btn-primary {
+    padding:8px 16px;
+    border-radius:8px;
+    border:none;
+    background:var(--verde);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+.btn-primary:hover { background:var(--verde-oscuro); }
+.btn-secondary {
+    padding:8px 14px;
+    border-radius:8px;
+    border:none;
+    background:var(--gris-claro);
+    color:var(--gris);
+    font-weight:500;
+    cursor:pointer;
+}
+.btn-secondary:hover { background:#bdc3c7; }
+
+.btn-back {
+    display:inline-block;
+    margin:0 20px 25px;
+    padding:10px 18px;
+    border-radius:8px;
+    background:var(--gris-claro);
+    color:var(--gris);
+    text-decoration:none;
+    font-weight:500;
+}
+.btn-back:hover { background:#bdc3c7; }
+
+@media(max-width:900px){
+    .admin-container { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Admin - Recompensas</h1>
+  <p>Configura el catálogo de recompensas y ajusta puntos de usuarios</p>
+</div>
+
+<a href="/menu" class="btn-back">⬅ Volver al menú</a>
+
+<div class="admin-container">
+
+  <div>
+    <div id="msgRewards" class="alert alert-success"></div>
+
+    <div class="card-table">
+      <div class="card-table-header">
+        <h2>Recompensas disponibles</h2>
+        <span>Catálogo visible para los usuarios</span>
+      </div>
+
+      <div class="table-scroll">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Puntos</th>
+              <th>Activo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaRewardsAdmin"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card-form">
+      <h2 id="formTitleRewards">Crear recompensa</h2>
+
+      <form id="rewardForm">
+        <input type="hidden" id="rewardId">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nombreReward">Nombre</label>
+            <input type="text" id="nombreReward" required>
+          </div>
+
+          <div class="form-group">
+            <label for="puntosReward">Puntos necesarios</label>
+            <input type="number" id="puntosReward" min="1" required>
+          </div>
+
+          <div class="form-group">
+            <label for="descReward">Descripción</label>
+            <textarea id="descReward"></textarea>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" id="activoReward" checked>
+            <label for="activoReward">Recompensa activa</label>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn-secondary" onclick="resetRewardForm()">Limpiar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const msgRewards = document.getElementById("msgRewards");
+const tablaRewardsAdmin = document.getElementById("tablaRewardsAdmin");
+const rewardForm = document.getElementById("rewardForm");
+const formTitleRewards = document.getElementById("formTitleRewards");
+let editingRewardId = null;
+
+function mostrarMsgRewards(texto, esError = false) {
+  msgRewards.style.display = "block";
+  msgRewards.className = "alert " + (esError ? "alert-error" : "alert-success");
+  msgRewards.textContent = texto;
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[m]));
+}
+
+async function cargarRewardsAdmin() {
+  const res = await fetch("/admin/rewards");
+  if (!res.ok) {
+    tablaRewardsAdmin.innerHTML = `<tr><td colspan="5" style="padding:8px;color:#c00;">Error ${res.status}</td></tr>`;
+    mostrarMsgRewards("No se pudieron cargar las recompensas (status " + res.status + ").", true);
+    return;
+  }
+  const data = await res.json();
+  if (!data.length) {
+    tablaRewardsAdmin.innerHTML = `<tr><td colspan="5" style="padding:8px;color:#666;">No hay recompensas creadas.</td></tr>`;
+    return;
+  }
+
+  tablaRewardsAdmin.innerHTML = data.map(r => `
+    <tr>
+      <td>${r.id}</td>
+      <td>${escapeHtml(r.nombre)}</td>
+      <td>${r.puntos_necesarios}</td>
+      <td>${r.activo ? "Sí" : "No"}</td>
+      <td>
+        <button class="btn-chip btn-edit" onclick="editarReward(${r.id})">Editar</button>
+        <button class="btn-chip btn-delete" onclick="eliminarReward(${r.id})">Eliminar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function resetRewardForm() {
+  editingRewardId = null;
+  rewardForm.reset();
+  document.getElementById("rewardId").value = "";
+  document.getElementById("activoReward").checked = true;
+  formTitleRewards.textContent = "Crear recompensa";
+}
+
+async function editarReward(id) {
+  const res = await fetch("/admin/rewards");
+  if (!res.ok) return;
+  const data = await res.json();
+  const r = data.find(x => x.id === id);
+  if (!r) return;
+
+  editingRewardId = id;
+  document.getElementById("rewardId").value = id;
+  document.getElementById("nombreReward").value = r.nombre || "";
+  document.getElementById("puntosReward").value = r.puntos_necesarios || 0;
+  document.getElementById("descReward").value = r.descripcion || "";
+  document.getElementById("activoReward").checked = !!r.activo;
+  formTitleRewards.textContent = "Editar recompensa #" + id;
+}
+
+async function eliminarReward(id) {
+  if (!confirm("¿Eliminar la recompensa #" + id + "?")) return;
+  const res = await fetch(`/admin/rewards/${id}`, { method: "DELETE" });
+  if (res.ok) {
+    mostrarMsgRewards("Recompensa eliminada correctamente.");
+    await cargarRewardsAdmin();
+    if (editingRewardId === id) resetRewardForm();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMsgRewards("Error al eliminar recompensa: " + (txt || `status ${res.status}`), true);
+  }
+}
+
+rewardForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const fd = new FormData();
+  fd.append("nombre", document.getElementById("nombreReward").value.trim());
+  fd.append("puntos_necesarios", document.getElementById("puntosReward").value);
+  fd.append("descripcion", document.getElementById("descReward").value.trim());
+  fd.append("activo", document.getElementById("activoReward").checked ? "true" : "false");
+
+  let url = "/admin/rewards";
+  let method = "POST";
+
+  if (editingRewardId) {
+    url = `/admin/rewards/${editingRewardId}`;
+    method = "POST";
+  }
+
+  const res = await fetch(url, { method, body: fd });
+  if (res.ok) {
+    mostrarMsgRewards(editingRewardId ? "Recompensa actualizada." : "Recompensa creada.");
+    resetRewardForm();
+    await cargarRewardsAdmin();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMsgRewards("Error al guardar recompensa: " + (txt || `status ${res.status}`), true);
+  }
+});
+
+cargarRewardsAdmin();
+</script>
+
+</body>
+</html>

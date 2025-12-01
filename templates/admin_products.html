@@ -3,129 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EcoMarket - Panel Admin Productos</title>
+<title>Admin - Productos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
+
 <style>
+:root {
+    --verde: #2ecc71;
+    --verde-oscuro: #27ae60;
+    --gris-claro: #ecf0f1;
+    --gris: #2c3e50;
+}
+
 body {
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg, #e8f5e9 0%, #6cbb80be 100%);
-    padding: 30px;
-    color: #2e7d32;
+    font-family: 'Poppins', sans-serif;
+    margin:0; padding:0;
+    background:#f5f8f5; color:#2e7d32;
 }
-h1 {
-    text-align: center;
-    font-size: 2.5em;
-    font-weight: 800;
-    margin-bottom: 20px;
+
+.header {
+    text-align:center; background: linear-gradient(90deg,#165c19,#43a047);
+    color:white; padding:40px 20px; box-shadow:0 5px 20px rgba(0,0,0,0.2); margin-bottom:30px;
 }
-.container {
-    max-width: 900px;
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    margin: auto;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+.header h1 { font-size:3rem; margin-bottom:5px; }
+.header p { font-size:1.1rem; }
+
+.admin-container { display:flex; gap:20px; max-width:1200px; margin:0 auto; padding:0 20px; }
+.filters-panel {
+    min-width:250px; background:#fff; border-radius:12px; padding:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2); position:sticky; top:20px; height:fit-content;
 }
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 30px;
-}
-input, select, button {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #a5d6a7;
-    font-size: 15px;
-}
-button {
-    background: linear-gradient(90deg, #43a047, #4caf50);
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-button:hover {
-    background: linear-gradient(90deg, #388e3c, #43a047);
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #c8e6c9;
-    text-align: left;
-}
-th {
-    background: #43a047;
-    color: white;
-    text-transform: uppercase;
-}
-tr:hover {
-    background-color: #f1fff1;
-}
-a {
-    color: #388e3c;
-    text-decoration: none;
-}
-a:hover { text-decoration: underline; }
+.filters-panel h3 { font-size:1.3rem; margin-bottom:15px; }
+.filters-panel label { display:block; margin-top:10px; font-weight:500; color:#34495e; }
+.filters-panel select, .filters-panel button { width:100%; margin-top:5px; padding:8px; border-radius:8px; border:1px solid #ccc; }
+.filters-panel button { background: var(--verde); color:white; font-weight:600; border:none; margin-top:15px; cursor:pointer; }
+.filters-panel button:hover { background: var(--verde-oscuro); }
+
+.products-section { flex:1; }
+.top-buttons { display:flex; justify-content: space-between; align-items:center; margin-bottom:15px; }
+.top-buttons button, .top-buttons a { padding:10px 18px; border-radius:8px; font-weight:500; text-decoration:none; cursor:pointer; border:none; }
+.top-buttons .create { background:var(--verde); color:white; } .top-buttons .create:hover { background: var(--verde-oscuro); }
+.top-buttons .back { background:var(--gris-claro); color:var(--gris); } .top-buttons .back:hover { background:#bdc3c7; }
+
+.products-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+
+.product-card { background:white; border-radius:12px; padding:15px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center; transition:0.3s; }
+.product-card:hover { transform:translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.2); }
+.product-card img { width:100%; height:180px; object-fit:cover; border-radius:10px; }
+.product-card h4 { font-size:1.2rem; margin:10px 0; }
+.product-card p { font-size:0.95rem; color:#555; }
+.product-card .actions { display:flex; justify-content:space-around; margin-top:10px; }
+.product-card .actions button { padding:6px 12px; border:none; border-radius:8px; cursor:pointer; font-weight:500; transition:0.2s; }
+.actions .edit { background:#f1c40f; color:white; } .actions .edit:hover { background:#d4ac0d; }
+.actions .delete { background:#e74c3c; color:white; } .actions .delete:hover { background:#c0392b; }
+
+.modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); }
+.modal-content { background:white; margin:5% auto; padding:30px; border-radius:15px; width:90%; max-width:600px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+.modal-content h2 { color:#2e7d32; margin-bottom:20px; }
+.close { color:#aaa; float:right; font-size:28px; font-weight:bold; cursor:pointer; }
+.close:hover { color:#000; }
+
+.form-group { margin-bottom:15px; }
+.form-group label { display:block; margin-bottom:6px; font-weight:600; color:#2e7d32; }
+.form-group input, .form-group select, .form-group textarea { width:100%; padding:10px; border:2px solid #c8e6c9; border-radius:8px; font-size:14px; }
+.form-group textarea { resize:vertical; min-height:80px; }
+.form-buttons { display:flex; justify-content:flex-end; gap:10px; margin-top:15px; }
+.form-buttons button { padding:10px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }
+.btn-submit { background:var(--verde); color:white; } .btn-submit:hover { background:var(--verde-oscuro); }
+.btn-cancel { background:var(--gris-claro); color:var(--gris); } .btn-cancel:hover { background:#bdc3c7; }
+
+.no-products { grid-column:1/-1; text-align:center; padding:40px; color:#7f8c8d; }
+
+@media(max-width:900px){.admin-container{flex-direction:column;}.filters-panel{position:static;width:100%;}}
 </style>
 </head>
 <body>
 
-<h1>Panel de Administración de Productos</h1>
-<div class="container">
+<div class="header">
+    <h1>Admin - Productos</h1>
+    <p>Gestiona los productos de EcoMarket</p>
+</div>
 
-    <form method="POST" action="/admin/products">
-        <h2>Agregar nuevo producto</h2>
-        <input type="text" name="name" placeholder="Nombre del producto" required>
-        <input type="text" name="description" placeholder="Descripción (opcional)">
-        <select name="category" required>
-            <option value="">Seleccionar categoría</option>
-            <option value="ropa">Ropa</option>
-            <option value="electronicos">Electrónicos</option>
-            <option value="muebles">Muebles</option>
-            <option value="libros">Libros</option>
-            <option value="otros">Otros</option>
+<div class="admin-container">
+
+    <!-- FILTROS -->
+    <div class="filters-panel">
+        <h3>Filtros</h3>
+        <label for="category">Categoría:</label>
+        <select id="category">
+            <option value="">Todos</option>
+            <option value="Plásticos">Plásticos</option>
+            <option value="Vidrio">Vidrio</option>
+            <option value="Papel">Papel</option>
+            <option value="Metales">Metales</option>
+            <option value="Electrónicos">Electrónicos</option>
         </select>
-        <input type="number" name="owner_id" placeholder="ID del propietario" required>
-        <button type="submit">Agregar Producto</button>
-    </form>
 
-    <h2>Productos existentes</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Estado</th>
-                <th>Propietario (ID)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in products %}
-            <tr>
-                <td>{{ p.id }}</td>
-                <td>{{ p.name }}</td>
-                <td>{{ p.description or "" }}</td>
-                <td>{{ p.category }}</td>
-                <td>{{ p.status }}</td>
-                <td>{{ p.owner_id }}</td>
-            </tr>
-            {% endfor %}
-            {% if products|length == 0 %}
-            <tr>
-                <td colspan="6" style="text-align:center;">No hay productos registrados.</td>
-            </tr>
-            {% endif %}
-        </tbody>
-    </table>
+        <label for="status">Estado:</label>
+        <select id="status">
+            <option value="">Todos</option>
+            <option value="disponible">Disponible</option>
+            <option value="agotado">Agotado</option>
+        </select>
 
-    <div style="margin-top:20px; text-align:center;">
-        <a href="/menu">⬅ Volver al menú principal</a>
+        <button onclick="applyFilters()">Aplicar filtros</button>
     </div>
 
+    <!-- PRODUCTOS -->
+    <div class="products-section">
+        <div class="top-buttons">
+            <a href="/menu" class="back">⬅ Regresar</a>
+            <button onclick="openCreateModal()" class="create">+ Crear Producto</button>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <!-- Productos se renderizan aquí -->
+        </div>
+    </div>
 </div>
+
+<!-- MODAL -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Crear Producto</h2>
+        <form id="productForm">
+            <input type="hidden" id="productId">
+            <div class="form-group"><label>Nombre:</label><input id="name" required></div>
+            <div class="form-group"><label>Descripción:</label><textarea id="description"></textarea></div>
+            <div class="form-group"><label>Categoría:</label>
+                <select id="categoryInput" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="Plásticos">Plásticos</option>
+                    <option value="Vidrio">Vidrio</option>
+                    <option value="Papel">Papel</option>
+                    <option value="Metales">Metales</option>
+                    <option value="Electrónicos">Electrónicos</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Precio (L):</label><input type="number" id="price" step="0.01" required></div>
+            <div class="form-group"><label>Stock:</label><input type="number" id="stock" required></div>
+            <div class="form-group"><label>Estado:</label>
+                <select id="statusInput">
+                    <option value="disponible">Disponible</option>
+                    <option value="agotado">Agotado</option>
+                </select>
+            </div>
+            <div class="form-group"><label>URL Imagen:</label><input type="url" id="image_url" placeholder="https://..."></div>
+            <div class="form-buttons">
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button type="submit" class="btn-submit">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let products = [];
+let editingProductId = null;
+
+async function loadProducts() {
+    try {
+        const res = await fetch('/admin_productos/api/all');
+        if(res.ok){ products = await res.json(); renderProducts(products); }
+    } catch(e){ console.error(e); }
+}
+
+function renderProducts(list) {
+    const grid = document.getElementById('productsGrid');
+    if(!list || list.length===0){ grid.innerHTML='<div class="no-products">No hay productos registrados.</div>'; return; }
+    grid.innerHTML = list.map(p=>`
+        <div class="product-card">
+            <img src="${p.image_url||'/static/default.png'}" alt="${p.name}" onerror="this.src='/static/default.png'">
+            <h4>${p.name}</h4>
+            <p>${p.description||'Sin descripción'}</p>
+            <p><strong>Precio:</strong> L ${p.price}</p>
+            <p><strong>Stock:</strong> ${p.stock}</p>
+            <p><strong>Estado:</strong> ${p.status}</p>
+            <div class="actions">
+                <button class="edit" onclick="openEditModal(${p.id})">Editar</button>
+                <button class="delete" onclick="deleteProduct(${p.id})">Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openCreateModal(){ editingProductId=null; document.getElementById('modalTitle').textContent='Crear Producto'; document.getElementById('productForm').reset(); document.getElementById('productModal').style.display='block'; }
+
+async function openEditModal(id){
+    editingProductId=id;
+    document.getElementById('modalTitle').textContent='Editar Producto';
+    try {
+        const res=await fetch(`/admin_productos/api/${id}`);
+        if(res.ok){
+            const p=await res.json();
+            document.getElementById('productId').value=p.id;
+            document.getElementById('name').value=p.name;
+            document.getElementById('description').value=p.description||'';
+            document.getElementById('categoryInput').value=p.category;
+            document.getElementById('price').value=p.price;
+            document.getElementById('stock').value=p.stock;
+            document.getElementById('statusInput').value=p.status;
+            document.getElementById('image_url').value=p.image_url||'';
+            document.getElementById('productModal').style.display='block';
+        }
+    } catch(e){ console.error(e); }
+}
+
+function closeModal(){ document.getElementById('productModal').style.display='none'; document.getElementById('productForm').reset(); editingProductId=null; }
+
+document.getElementById('productForm').addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    const formData={
+        name:document.getElementById('name').value,
+        description:document.getElementById('description').value,
+        category:document.getElementById('categoryInput').value,
+        price:parseFloat(document.getElementById('price').value),
+        stock:parseInt(document.getElementById('stock').value),
+        status:document.getElementById('statusInput').value,
+        image_url:document.getElementById('image_url').value||null
+    };
+    try{
+        let res;
+        if(editingProductId){
+            res=await fetch(`/admin_productos/api/${editingProductId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(formData)});
+        } else {
+            res=await fetch('/admin_productos/api/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(formData)});
+        }
+        if(res.ok){ closeModal(); loadProducts(); } else { alert('Error al guardar producto'); }
+    }catch(e){ console.error(e); alert('Error al guardar producto'); }
+});
+
+async function deleteProduct(id){ if(!confirm('¿Eliminar este producto?')) return; try{ const res=await fetch(`/admin_productos/api/${id}`,{method:'DELETE'}); if(res.ok) loadProducts(); else alert('Error al eliminar'); }catch(e){console.error(e); alert('Error al eliminar'); } }
+
+function applyFilters(){
+    const cat=document.getElementById('category').value;
+    const status=document.getElementById('status').value;
+    let filtered=products;
+    if(cat) filtered=filtered.filter(p=>p.category===cat);
+    if(status) filtered=filtered.filter(p=>p.status===status);
+    renderProducts(filtered);
+}
+
+window.onclick=function(e){ if(e.target===document.getElementById('productModal')) closeModal(); }
+
+loadProducts();
+</script>
+
 </body>
 </html>

@@ -1,281 +1,194 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EcoMarket - Registro</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+{% extends "base.html" %}
+{% block title %}EcoMarket - Registro{% endblock %}
 
-body {
-    font-family: 'Poppins', Arial, sans-serif;
-    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-    color: #2e7d32;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 30px;
-}
+{% block content %}
 
-/* HEADER */
-.header {
-    text-align: center;
-    background: linear-gradient(90deg, #165c19, #43a047);
-    color: white;
-    padding: 50px 20px;
-    border-radius: 30px;
-    margin-bottom: 40px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-}
+<section class="hero" style="padding:40px 10px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+  <h2 style="font-size:3rem;font-weight:800;margin-bottom:10px;color:#1b5e20;text-align:center;">
+    EcoMarket
+  </h2>
+  <p style="font-size:1.1rem;color:#2e7d32;text-align:center;">
+    Crea tu cuenta y súmate al movimiento verde.
+  </p>
+</section>
 
-.header-title {
-    font-size: 4em;
-    font-weight: 800;
-    text-shadow: 2px 3px 6px rgba(0,0,0,0.25);
-}
+<div style="
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px 20px 60px;
+">
+  <div style="
+      background:#ffffff;
+      border-radius:24px;
+      padding:36px 32px 30px;
+      width:100%;
+      max-width:480px;
+      box-shadow:0 10px 25px rgba(76,175,80,0.2);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+  ">
+    <h2 style="color:#2e7d32;text-align:center;font-weight:800;font-size:2rem;margin:0;">
+      Registrarse
+    </h2>
 
-.header p {
-    margin-top: 15px;
-    font-size: 1.2em;
-    font-weight: 500;
-}
+    <form id="registerForm"
+          action="/auth/register-form"
+          method="POST"
+          style="display:flex;flex-direction:column;gap:14px;">
 
-/* MAIN CONTENT */
-.main-content {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label for="fullname"
+               style="color:#2e7d32;font-weight:600;font-size:0.95rem;">
+          Nombre Completo
+        </label>
+        <input
+          type="text"
+          id="fullname"
+          name="fullname"
+          placeholder="Ingresa tu nombre completo"
+          required
+          style="
+            width:100%;
+            padding:12px 14px;
+            border:2px solid #c8e6c9;
+            border-radius:12px;
+            font-size:0.95rem;
+            background-color:#f9fff9;
+            box-sizing:border-box;
+          ">
+      </div>
 
-.login-container {
-    background: white;
-    border-radius: 30px;
-    padding: 50px 40px;
-    max-width: 550px;
-    width: 100%;
-    box-shadow: 0 10px 25px rgba(76,175,80,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label for="username"
+               style="color:#2e7d32;font-weight:600;font-size:0.95rem;">
+          Nombre de Usuario
+        </label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Elige un nombre de usuario"
+          required
+          style="
+            width:100%;
+            padding:12px 14px;
+            border:2px solid #c8e6c9;
+            border-radius:12px;
+            font-size:0.95rem;
+            background-color:#f9fff9;
+            box-sizing:border-box;
+          ">
+      </div>
 
-.login-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(76,175,80,0.3);
-}
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label for="email"
+               style="color:#2e7d32;font-weight:600;font-size:0.95rem;">
+          Correo Electrónico
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Ingresa tu correo electrónico"
+          required
+          style="
+            width:100%;
+            padding:12px 14px;
+            border:2px solid #c8e6c9;
+            border-radius:12px;
+            font-size:0.95rem;
+            background-color:#f9fff9;
+            box-sizing:border-box;
+          ">
+      </div>
 
-h2 {
-    color: #2e7d32;
-    margin-bottom: 30px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 2.2em;
-}
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label for="password"
+               style="color:#2e7d32;font-weight:600;font-size:0.95rem;">
+          Contraseña
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Crea una contraseña"
+          required
+          style="
+            width:100%;
+            padding:12px 14px;
+            border:2px solid #c8e6c9;
+            border-radius:12px;
+            font-size:0.95rem;
+            background-color:#f9fff9;
+            box-sizing:border-box;
+          ">
+      </div>
 
-.form-group {
-    margin-bottom: 25px;
-}
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label for="confirmPassword"
+               style="color:#2e7d32;font-weight:600;font-size:0.95rem;">
+          Confirmar Contraseña
+        </label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="Confirma tu contraseña"
+          required
+          style="
+            width:100%;
+            padding:12px 14px;
+            border:2px solid #c8e6c9;
+            border-radius:12px;
+            font-size:0.95rem;
+            background-color:#f9fff9;
+            box-sizing:border-box;
+          ">
+      </div>
 
-label {
-    display: block;
-    margin-bottom: 10px;
-    color: #2e7d32;
-    font-weight: 600;
-    font-size: 15px;
-}
+      <button type="submit"
+              style="
+                width:100%;
+                padding:13px;
+                background:linear-gradient(90deg,#43a047,#66bb6a);
+                color:white;
+                border:none;
+                border-radius:14px;
+                font-size:1rem;
+                font-weight:600;
+                cursor:pointer;
+                box-shadow:0 6px 18px rgba(67,160,71,0.35);
+              ">
+        Crear Cuenta
+      </button>
+    </form>
 
-input {
-    width: 100%;
-    padding: 15px 18px;
-    border: 2px solid #c8e6c9;
-    border-radius: 12px;
-    font-size: 15px;
-    background-color: #f9fff9;
-    transition: all 0.3s ease;
-}
+    <div style="text-align:center;font-size:0.9rem;color:#555;margin-top:4px;">
+      <p style="margin:0;">
+        ¿Ya tienes cuenta?
+        <a href="/auth/login" style="color:#43a047;font-weight:600;">Inicia sesión aquí</a>
+      </p>
+    </div>
 
-input:focus {
-    outline: none;
-    border-color: #43a047;
-    box-shadow: 0 0 12px rgba(67,160,71,0.3);
-    background-color: #ffffff;
-}
-
-button {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(90deg, #43a047, #66bb6a);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    font-size: 17px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    background: linear-gradient(90deg, #388e3c, #43a047);
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(67,160,71,0.4);
-}
-
-.register-link {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 15px;
-}
-
-/* FOOTER */
-.main-footer {
-    background: linear-gradient(90deg, #165c19, #2e7d32);
-    color: white;
-    padding: 40px 20px;
-    margin-top: 50px;
-    border-radius: 30px;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-}
-
-.footer-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 30px;
-}
-
-.footer-section h4 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.footer-section ul {
-    list-style: none;
-}
-
-.footer-section ul li a {
-    color: #c8e6c9;
-    text-decoration: none;
-    font-size: 14px;
-    transition: 0.3s;
-}
-
-.footer-section ul li a:hover {
-    color: white;
-    text-decoration: underline;
-}
-
-.footer-bottom {
-    text-align: center;
-    padding-top: 25px;
-    border-top: 1px solid rgba(255,255,255,0.2);
-    color: #c8e6c9;
-    font-size: 14px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-    .header-title { font-size: 2.5em; }
-}
-</style>
-</head>
-
-<body>
-
-<!-- HEADER -->
-<div class="header">
-    <h1 class="header-title">EcoMarket</h1>
-    <p>Crea tu cuenta y súmate al movimiento verde.</p>
+    <button type="button"
+            onclick="window.location.href='/'"
+            style="
+              width:100%;
+              padding:12px;
+              background:#ff9800;
+              color:white;
+              border:none;
+              border-radius:12px;
+              font-size:0.95rem;
+              font-weight:600;
+              cursor:pointer;
+              margin-top:8px;
+            ">
+      Volver al Menú Principal
+    </button>
+  </div>
 </div>
 
-<!-- MAIN -->
-<div class="main-content">
-    <div class="login-container">
-        <h2>Registrarse</h2>
-
-        <form id="registerForm" action="/register" method="POST">
-
-            <div class="form-group">
-                <label for="fullname">Nombre Completo:</label>
-                <input type="text" id="fullname" name="fullname" placeholder="Ingresa tu nombre completo" required>
-            </div>
-
-            <div class="form-group">
-                <label for="username">Nombre de Usuario:</label>
-                <input type="text" id="username" name="username" placeholder="Elige un nombre de usuario" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Correo Electrónico:</label>
-                <input type="email" id="email" name="email" placeholder="Ingresa tu correo electrónico" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" placeholder="Crea una contraseña" required>
-            </div>
-
-            <div class="form-group">
-                <label for="confirmPassword">Confirmar Contraseña:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña" required>
-            </div>
-
-            <button type="submit">Crear Cuenta</button>
-        </form>
-
-        <div class="register-link">
-            <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a></p>
-        </div>
-    </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="main-footer">
-    <div class="footer-content">
-
-        <div class="footer-section">
-            <h4>EcoMarket</h4>
-            <ul>
-                <li><a href="#">Quiénes somos</a></li>
-                <li><a href="#">Compromiso ambiental</a></li>
-                <li><a href="#">Blog verde</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-section">
-            <h4>Puntos de Recolección</h4>
-            <ul>
-                <li><a href="#">Mapa interactivo</a></li>
-
-            </ul>
-        </div>
-
-        <div class="footer-section">
-            <h4>Ayuda</h4>
-            <ul>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Políticas</a></li>
-                <li><a href="#">Soporte</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-section">
-            <h4>Contacto</h4>
-            <ul>
-                <li><a href="#">Correo</a></li>
-                <li><a href="#">Teléfono</a></li>
-                <li><a href="#">Formulario</a></li>
-            </ul>
-        </div>
-
-    </div>
-
-    <div class="footer-bottom">
-        <p>&copy; 2024 EcoMarket. Todos los derechos reservados. | Hecho con 💚 para el planeta</p>
-    </div>
-</footer>
-
-</body>
-</html>
+{% endblock %}

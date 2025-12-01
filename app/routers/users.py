@@ -1,107 +1,136 @@
-from fastapi import APIRouter, HTTPException, Form
-from pydantic import BaseModel, EmailStr
+from fastapi import APIRouter, Request, Form, HTTPException, Depends
+from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
+
 from app.database.connection import database
 from app.database.tables import users
-from app.utils.security import hash_password, verify_password
+from app.utils.security import require_admin, hash_password
+from app.utils.points import add_points
 
-router = APIRouter(
-    prefix="/api/users",
-    tags=["Usuarios"]
-)
+router = APIRouter()
+templates = Jinja2Templates(directory="templates")
 
-# -------------------------------
-# MODELOS Pydantic
-# -------------------------------
-class UserCreate(BaseModel):
-    first_name: str
-    last_name: str
-    username: str
-    email: EmailStr
-    password: str
 
-class UserUpdate(BaseModel):
-    first_name: str
-    last_name: str
-    username: str
-    email: EmailStr
-    password: str | None = None
+# GET /register → muestra formulario HTML
+@router.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
-class UserOut(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    username: str
-    email: EmailStr
 
-# -------------------------------
-# CREAR USUARIO
-# -------------------------------
-@router.post("/", response_model=dict)
-async def create_user(user: UserCreate):
-    # Verificar duplicados
-    if await database.fetch_one(users.select().where(users.c.username == user.username)):
+# POST /register-form → procesa formulario de registro
+@router.post("/register-form")
+@router.post("/register")
+async def register_form(
+    fullname: str = Form(...),
+    username: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    confirmPassword: str = Form(...)
+):
+    if password != confirmPassword:
+        raise HTTPException(status_code=400, detail="Las contraseñas no coinciden")
+
+    # Validar duplicados
+    if await database.fetch_one(users.select().where(users.c.usuario == username)):
         raise HTTPException(status_code=400, detail="Usuario ya existe")
-    if await database.fetch_one(users.select().where(users.c.email == user.email)):
+    if await database.fetch_one(users.select().where(users.c.email == email)):
         raise HTTPException(status_code=400, detail="Correo ya registrado")
 
-    query = users.insert().values(
-        first_name=user.first_name.strip(),
-        last_name=user.last_name.strip(),
-        username=user.username.strip(),
-        email=user.email.strip(),
-        password=hash_password(user.password)
+    # Guardar usuario y obtener id
+    user_id = await database.execute(
+        users.insert().values(
+            nombre_completo=fullname,
+            usuario=username,
+            email=email,
+            password=hash_password(password),
+            role="user",
+        )
     )
-    await database.execute(query)
-    return {"status": "success", "message": "Usuario agregado"}
 
-# -------------------------------
-# LISTAR USUARIOS
-# -------------------------------
-@router.get("/", response_model=list[UserOut])
-async def list_users():
-    result = await database.fetch_all(users.select())
+    # ➕ Puntos por registro
+    await add_points(user_id, 20, "Registro de cuenta", "registro")
+
+    return RedirectResponse(url="/auth/login", status_code=303)
+
+
+# ====== ADMIN: CRUD USUARIOS ======
+
+@router.get("/admin/users")
+async def admin_list_users(admin=Depends(require_admin)):
+    query = users.select().order_by(users.c.id.desc())
+    result = await database.fetch_all(query)
     return [dict(r) for r in result]
 
-# -------------------------------
-# OBTENER USUARIO POR ID
-# -------------------------------
-@router.get("/{user_id}", response_model=UserOut)
-async def get_user(user_id: int):
-    user = await database.fetch_one(users.select().where(users.c.id == user_id))
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    return dict(user)
 
-# -------------------------------
-# ACTUALIZAR USUARIO
-# -------------------------------
-@router.put("/{user_id}", response_model=dict)
-async def update_user(user_id: int, user: UserUpdate):
-    db_user = await database.fetch_one(users.select().where(users.c.id == user_id))
-    if not db_user:
+@router.post("/admin/users")
+async def admin_create_user(
+    request: Request,
+    nombre_completo: str = Form(...),
+    usuario: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    role: str = Form(...),
+    admin=Depends(require_admin),
+):
+    # Validar duplicados
+    if await database.fetch_one(users.select().where(users.c.usuario == usuario)):
+        raise HTTPException(status_code=400, detail="Usuario ya existe")
+    if await database.fetch_one(users.select().where(users.c.email == email)):
+        raise HTTPException(status_code=400, detail="Correo ya registrado")
+
+    await database.execute(
+        users.insert().values(
+            nombre_completo=nombre_completo,
+            usuario=usuario,
+            email=email,
+            password=hash_password(password),
+            role=role,
+        )
+    )
+    return {"ok": True}
+
+
+@router.post("/admin/users/{user_id}")
+async def admin_update_user(
+    user_id: int,
+    nombre_completo: str = Form(...),
+    usuario: str = Form(...),
+    email: str = Form(...),
+    role: str = Form(...),
+    password: str = Form(""),
+    admin=Depends(require_admin),
+):
+    # Comprobar que existe
+    existing = await database.fetch_one(users.select().where(users.c.id == user_id))
+    if not existing:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    values = {
-        "first_name": user.first_name.strip(),
-        "last_name": user.last_name.strip(),
-        "username": user.username.strip(),
-        "email": user.email.strip()
+    valores = {
+        "nombre_completo": nombre_completo,
+        "usuario": usuario,
+        "email": email,
+        "role": role,
     }
-    if user.password:
-        values["password"] = hash_password(user.password)
+    if password.strip():
+        valores["password"] = hash_password(password)
 
-    query = users.update().where(users.c.id == user_id).values(**values)
-    await database.execute(query)
-    return {"status": "success", "message": "Usuario actualizado"}
+    # Validar duplicados (usuario/email de otros ids)
+    if await database.fetch_one(
+        users.select().where(users.c.usuario == usuario, users.c.id != user_id)
+    ):
+        raise HTTPException(status_code=400, detail="Usuario ya existe")
+    if await database.fetch_one(
+        users.select().where(users.c.email == email, users.c.id != user_id)
+    ):
+        raise HTTPException(status_code=400, detail="Correo ya registrado")
 
-# -------------------------------
-# ELIMINAR USUARIO
-# -------------------------------
-@router.delete("/{user_id}", response_model=dict)
-async def delete_user(user_id: int):
-    db_user = await database.fetch_one(users.select().where(users.c.id == user_id))
-    if not db_user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    query = users.delete().where(users.c.id == user_id)
-    await database.execute(query)
-    return {"status": "success", "message": "Usuario eliminado"}
+    await database.execute(
+        users.update().where(users.c.id == user_id).values(**valores)
+    )
+    return {"ok": True}
+
+
+@router.delete("/admin/users/{user_id}")
+async def admin_delete_user(user_id: int, admin=Depends(require_admin)):
+    await database.execute(users.delete().where(users.c.id == user_id))
+    return {"ok": True}

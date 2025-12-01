@@ -1,175 +1,192 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Solicitudes EcoMarket</title>
-<style>
-body {
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg,#e8f5e9,#c8e6c9);
-    margin: 0;
-    color: #2e7d32;
-}
-header {
-    background: #43a047;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-header h1 { margin: 0; font-size: 2em; }
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #c8e6c9;
-}
-th {
-    background: #66bb6a;
-    color: white;
-}
-button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    font-weight: 600;
-    margin-right: 5px;
-}
-button.aprobar { background: #43a047; }
-button.rechazar { background: #e53935; }
-button.eliminar { background: #757575; }
-button:hover { opacity: 0.85; }
-.status {
-    font-weight: bold;
-}
-.status.pendiente { color: #ff9800; }
-.status.aprobada { color: #4caf50; }
-.status.rechazada { color: #e53935; }
-</style>
-</head>
-<body>
-    
+{% extends "base.html" %}
+{% block content %}
 
-<header style="position: relative;">
-    <h1>Panel de Administración - Solicitudes</h1>
-    <a href="/menu" style="
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #388e3c;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-    ">⬅ Volver al menú</a>
-</header>
+<div class="solicitudes-layout">
+  <div class="solicitudes-header">
+    <div>
+      <div class="solicitudes-title">
+        <div class="solicitudes-title-icon">-></div>
+        <span>Mis solicitudes</span>
+      </div>
+      <p class="solicitudes-subtitle">
+        Envía solicitudes para donar, intercambiar o comprar materiales reciclables.
+      </p>
+    </div>
+    <span class="solicitudes-badge">Panel de usuario</span>
+  </div>
 
+  <!-- Formulario -->
+  <div class="solicitud-card">
+    <div class="solicitud-card-header">
+      <h3>Nueva solicitud</h3>
+      <span>Completa los datos y envíalos al equipo de EcoMarket</span>
+    </div>
 
-<div class="container">
-    <h2>Solicitudes de Usuarios</h2>
-    <table id="solicitudesTable">
+    <form id="solicitudForm">
+      <div class="solicitud-form-grid">
+        <div>
+          <label>Producto</label>
+          <input id="producto" type="text" placeholder="Ej: Botellas PET, Televisor 32''" required>
+        </div>
+
+        <div>
+          <label>Cantidad</label>
+          <input id="cantidad" type="number" min="1" value="1" required>
+        </div>
+
+        <div>
+          <label>Tipo</label>
+          <select id="tipo" required>
+            <option value="donar">Donar</option>
+            <option value="intercambiar">Intercambiar</option>
+            <option value="comprar">Comprar</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Descripción (opcional)</label>
+          <textarea id="descripcion" rows="3" placeholder="Detalles adicionales (medidas, estado, ubicación, etc.)"></textarea>
+        </div>
+      </div>
+
+      <div class="solicitud-actions">
+        <button type="submit" class="btn-primary">Enviar solicitud</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Mensajes -->
+  <div id="mensajeEstado" class="alert alert-success"></div>
+
+  <!-- Tabla -->
+  <div class="card-table" style="margin-top:16px;">
+    <div class="card-table-header">
+      <h4>Historial de solicitudes</h4>
+      <span>Revisa el estado de cada solicitud enviada</span>
+    </div>
+    <div class="table-scroll">
+      <table class="table-modern">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Usuario</th>
-                <th>Tipo</th>
-                <th>Producto</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+          </tr>
         </thead>
-        <tbody>
-            <!-- Filas se cargan con JS -->
+        <tbody id="tablaSolicitudes">
+          <tr><td colspan="6" style="padding:12px;color:#666">Cargando...</td></tr>
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-const API_BASE = "http://127.0.0.1:8000";
+async function fetchWithFallback(paths, options) {
+  for (const p of paths) {
+    try {
+      const res = await fetch(p, options);
+      if (res.status !== 404) return { res, path: p };
+    } catch (e) {
+      console.warn("fetch failed for", p, e);
+    }
+  }
+  return null;
+}
+function candidate(path) { return [path, "/solicitudes" + path]; }
 
-// Función para cargar solicitudes
+const msgBox = document.getElementById("mensajeEstado");
+
+function mostrarMensaje(texto, esError = false) {
+  msgBox.style.display = "block";
+  msgBox.classList.toggle("alert-success", !esError);
+  msgBox.classList.toggle("alert-error", esError);
+  msgBox.textContent = texto;
+}
+
+function estadoChip(estadoRaw) {
+  const e = (estadoRaw || "pendiente").toLowerCase();
+  let cls = "status-pendiente";
+  if (e === "aprobado") cls = "status-aprobado";
+  if (e === "rechazado") cls = "status-rechazado";
+  return `<span class="status-chip ${cls}">${e.toUpperCase()}</span>`;
+}
+
 async function cargarSolicitudes() {
-    const tbody = document.querySelector("#solicitudesTable tbody");
-    tbody.innerHTML = "Cargando...";
-    try {
-        const res = await fetch(`${API_BASE}/api/solicitudes`);
-        const data = await res.json();
-        tbody.innerHTML = "";
+  const attempt = await fetchWithFallback(candidate("/mis-solicitudes"));
+  const tbody = document.getElementById("tablaSolicitudes");
+  if (!attempt) {
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:12px;color:#c00">No se pudo conectar al endpoint de solicitudes.</td></tr>`;
+    return;
+  }
+  const { res } = attempt;
+  if (!res.ok) {
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:12px;color:#c00">Error al obtener solicitudes (status ${res.status}).</td></tr>`;
+    return;
+  }
+  const data = await res.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:12px;color:#666">No tienes solicitudes enviadas.</td></tr>`;
+    return;
+  }
 
-        data.solicitudes.forEach(s => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${s.id}</td>
-                <td>${s.username}</td>
-                <td>${s.tipo}</td>
-                <td>${s.producto_nombre}</td>
-                <td>${s.descripcion || ""}</td>
-                <td class="status ${s.estado.toLowerCase()}">${s.estado}</td>
-                <td>
-                    <button class="aprobar" onclick="cambiarEstado(${s.id}, 'Aprobada')">Aprobar</button>
-                    <button class="rechazar" onclick="cambiarEstado(${s.id}, 'Rechazada')">Rechazar</button>
-                    <button class="eliminar" onclick="eliminarSolicitud(${s.id})">Eliminar</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch(err) {
-        tbody.innerHTML = `<tr><td colspan="7">Error al cargar solicitudes: ${err.message}</td></tr>`;
-    }
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td>${s.id}</td>
+      <td>${escapeHtml(s.producto)}</td>
+      <td>${s.cantidad}</td>
+      <td>${escapeHtml(s.descripcion || '')}</td>
+      <td>${escapeHtml(s.tipo)}</td>
+      <td>${estadoChip(s.estado)}</td>
+    </tr>`).join('');
 }
 
-// Función para cambiar estado
-async function cambiarEstado(id, estado) {
-    try {
-        const res = await fetch(`${API_BASE}/api/solicitudes/update_status`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ solicitud_id: id, new_status: estado })
-        });
-        if (!res.ok) throw new Error("No se pudo actualizar el estado");
-        cargarSolicitudes();
-    } catch(err) {
-        alert("Error: " + err.message);
-    }
+document.getElementById("solicitudForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const payload = {
+    producto: document.getElementById("producto").value.trim(),
+    cantidad: parseInt(document.getElementById("cantidad").value, 10),
+    descripcion: document.getElementById("descripcion").value.trim(),
+    tipo: document.getElementById("tipo").value
+  };
+  if (!payload.producto || !payload.cantidad) {
+    mostrarMensaje("Complete producto y cantidad.", true);
+    return;
+  }
+  const attempt = await fetchWithFallback(candidate("/crear"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!attempt) {
+    mostrarMensaje("No se pudo conectar al servicio de solicitudes.", true);
+    return;
+  }
+  const { res } = attempt;
+  if (res.ok) {
+    mostrarMensaje("Tu solicitud fue enviada. El estado inicial es PENDIENTE.");
+    document.getElementById("solicitudForm").reset();
+    cargarSolicitudes();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMensaje("Error al enviar solicitud. " + (txt || `status ${res.status}`), true);
+  }
+});
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[m]));
 }
 
-// Función para eliminar solicitud
-async function eliminarSolicitud(id) {
-    if(!confirm("¿Seguro que deseas eliminar esta solicitud?")) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/solicitudes/delete`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ solicitud_id: id })
-        });
-        if (!res.ok) throw new Error("No se pudo eliminar la solicitud");
-        cargarSolicitudes();
-    } catch(err) {
-        alert("Error: " + err.message);
-    }
-}
-
-// Carga inicial
 cargarSolicitudes();
 </script>
 
-</body>
-</html>
+{% endblock %}

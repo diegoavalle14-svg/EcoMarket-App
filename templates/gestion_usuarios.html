@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Gestión de Usuarios</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --verde: #2ecc71;
+    --verde-oscuro: #27ae60;
+    --gris-claro: #ecf0f1;
+    --gris: #2c3e50;
+}
+
+/* Reset básico */
+* { box-sizing: border-box; }
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background:#f5f8f5;
+    color:#2e7d32;
+}
+
+/* Header similar al de solicitudes_admin */
+.header {
+    text-align:center;
+    background: linear-gradient(90deg,#165c19,#43a047);
+    color:white;
+    padding:40px 20px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    margin-bottom:30px;
+}
+.header h1 { font-size:3rem; margin-bottom:5px; }
+.header p  { font-size:1.1rem; }
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+/* Mensajes */
+.alert {
+    margin: 0 0 18px 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    display: none;
+}
+.alert-success {
+    background:#e8f5e9;
+    color:#1b5e20;
+    border:1px solid #c8e6c9;
+}
+.alert-error {
+    background:#ffebee;
+    color:#b71c1c;
+    border:1px solid #ffcdd2;
+}
+
+/* Tarjeta tabla */
+.card-table {
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    border:1px solid #e0f2f1;
+}
+.card-table-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+.card-table-header h2 {
+    margin:0;
+    font-size:1.4rem;
+    color:#2e7d32;
+}
+.card-table-header span {
+    font-size:0.9rem;
+    color:#78909c;
+}
+
+/* Tabla */
+.table-scroll { overflow-x:auto; }
+.table-modern {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+}
+.table-modern thead tr {
+    background:#f1f8e9;
+}
+.table-modern th,
+.table-modern td {
+    padding:8px 10px;
+    border-bottom:1px solid #eceff1;
+    text-align:left;
+    white-space:nowrap;
+}
+.table-modern tbody tr:hover {
+    background:#f9fbe7;
+}
+
+/* Rol chip */
+.role-chip {
+    display:inline-flex;
+    align-items:center;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:600;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+}
+.role-user {
+    background:#e3f2fd;
+    color:#1565c0;
+    border:1px solid #bbdefb;
+}
+.role-admin {
+    background:#fff3e0;
+    color:#ef6c00;
+    border:1px solid #ffe0b2;
+}
+
+/* Botones pequeños */
+.btn-chip {
+    padding:4px 9px;
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
+}
+.btn-edit {
+    background:#c8e6c9;
+    color:#1b5e20;
+}
+.btn-edit:hover {
+    background:#a5d6a7;
+    transform:translateY(-1px);
+}
+.btn-delete {
+    background:#ffcdd2;
+    color:#b71c1c;
+}
+.btn-delete:hover {
+    background:#ef9a9a;
+    transform:translateY(-1px);
+}
+
+/* Tarjeta formulario */
+.card-form {
+    background:white;
+    border-radius:16px;
+    padding:18px 18px 22px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    border:1px solid #e0f2f1;
+}
+.card-form h2 {
+    margin-top:0;
+    font-size:1.3rem;
+    color:#2e7d32;
+}
+.form-grid {
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:10px;
+}
+.form-group label {
+    font-size:0.85rem;
+    color:#546e7a;
+    display:block;
+    margin-bottom:3px;
+}
+.form-group input,
+.form-group select {
+    width:100%;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #cfd8dc;
+    font-family:'Poppins',sans-serif;
+    font-size:0.9rem;
+}
+.form-note {
+    font-size:0.75rem;
+    color:#78909c;
+}
+
+/* Botones form */
+.form-buttons {
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:12px;
+}
+.btn-primary {
+    padding:8px 16px;
+    border-radius:8px;
+    border:none;
+    background:var(--verde);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+.btn-primary:hover {
+    background:var(--verde-oscuro);
+}
+.btn-secondary {
+    padding:8px 14px;
+    border-radius:8px;
+    border:none;
+    background:var(--gris-claro);
+    color:var(--gris);
+    font-weight:500;
+    cursor:pointer;
+}
+.btn-secondary:hover {
+    background:#bdc3c7;
+}
+
+/* Botón volver */
+.btn-back {
+    display:inline-block;
+    margin:0 20px 25px;
+    padding:10px 18px;
+    border-radius:8px;
+    background:var(--gris-claro);
+    color:var(--gris);
+    text-decoration:none;
+    font-weight:500;
+}
+.btn-back:hover {
+    background:#bdc3c7;
+}
+
+/* Responsive */
+@media(max-width:900px){
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Admin - Gestión de Usuarios</h1>
+  <p>Administra las cuentas registradas en EcoMarket</p>
+</div>
+
+<a href="/menu" class="btn-back">⬅ Volver al menú</a>
+
+<div class="admin-container">
+
+  <div>
+    <div id="mensajeAdmin" class="alert alert-success"></div>
+
+    <div class="card-table">
+      <div class="card-table-header">
+        <h2>Usuarios registrados</h2>
+        <span>Ver, editar o eliminar usuarios</span>
+      </div>
+
+      <div class="table-scroll">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre completo</th>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaUsuarios"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card-form">
+      <h2 id="formTitle">Crear usuario</h2>
+      <p class="form-note" id="formNote">Los campos marcados son obligatorios.</p>
+
+      <form id="userForm">
+        <input type="hidden" id="userId">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nombre">Nombre completo</label>
+            <input type="text" id="nombre" required>
+          </div>
+
+          <div class="form-group">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Correo</label>
+            <input type="email" id="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="role">Rol</label>
+            <select id="role" required>
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" required>
+            <div class="form-note" id="passwordNote">
+              Para edición: deja vacío para mantener la contraseña actual.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn-secondary" onclick="resetForm()">Limpiar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const msgBoxAdmin = document.getElementById("mensajeAdmin");
+const tablaUsuarios = document.getElementById("tablaUsuarios");
+const userForm = document.getElementById("userForm");
+const formTitle = document.getElementById("formTitle");
+const formNote = document.getElementById("formNote");
+const passwordNote = document.getElementById("passwordNote");
+
+let editingId = null;
+
+function mostrarMensaje(texto, esError = false) {
+  msgBoxAdmin.style.display = "block";
+  msgBoxAdmin.classList.toggle("alert-success", !esError);
+  msgBoxAdmin.classList.toggle("alert-error", esError);
+  msgBoxAdmin.textContent = texto;
+}
+
+function roleChip(roleRaw) {
+  const r = (roleRaw || "user").toLowerCase();
+  const cls = r === "admin" ? "role-admin" : "role-user";
+  return `<span class="role-chip ${cls}">${r.toUpperCase()}</span>`;
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[m]));
+}
+
+async function cargarUsuarios() {
+  const res = await fetch("/admin/users");
+  if (!res.ok) {
+    tablaUsuarios.innerHTML = `<tr><td colspan="6" style="color:#c00;padding:10px;">Error ${res.status}</td></tr>`;
+    mostrarMensaje("No se pudieron cargar los usuarios (status " + res.status + ").", true);
+    return;
+  }
+
+  const data = await res.json();
+  if (!data.length) {
+    tablaUsuarios.innerHTML = `<tr><td colspan="6" style="color:#666;padding:10px;">No hay usuarios registrados.</td></tr>`;
+    mostrarMensaje("No hay usuarios registrados aún.");
+    return;
+  }
+
+  tablaUsuarios.innerHTML = data.map(u => `
+    <tr>
+      <td>${u.id}</td>
+      <td>${escapeHtml(u.nombre_completo)}</td>
+      <td>${escapeHtml(u.usuario)}</td>
+      <td>${escapeHtml(u.email)}</td>
+      <td>${roleChip(u.role)}</td>
+      <td>
+        <button class="btn-chip btn-edit" onclick="editarUsuario(${u.id})">Editar</button>
+        <button class="btn-chip btn-delete" onclick="eliminarUsuario(${u.id})">Eliminar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function resetForm() {
+  editingId = null;
+  userForm.reset();
+  document.getElementById("userId").value = "";
+  formTitle.textContent = "Crear usuario";
+  formNote.textContent = "Los campos marcados son obligatorios.";
+  passwordNote.textContent = "Para edición: deja vacío para mantener la contraseña actual.";
+  document.getElementById("password").required = true;
+}
+
+async function editarUsuario(id) {
+  const res = await fetch("/admin/users");
+  if (!res.ok) return;
+  const data = await res.json();
+  const user = data.find(u => u.id === id);
+  if (!user) return;
+
+  editingId = id;
+  document.getElementById("userId").value = id;
+  document.getElementById("nombre").value = user.nombre_completo || "";
+  document.getElementById("usuario").value = user.usuario || "";
+  document.getElementById("email").value = user.email || "";
+  document.getElementById("role").value = user.role || "user";
+  document.getElementById("password").value = "";
+  document.getElementById("password").required = false;
+
+  formTitle.textContent = "Editar usuario #" + id;
+  formNote.textContent = "Modifica los datos y guarda los cambios.";
+  passwordNote.textContent = "Si dejas la contraseña vacía, se mantendrá la actual.";
+}
+
+async function eliminarUsuario(id) {
+  if (!confirm("¿Seguro que deseas eliminar el usuario #" + id + "?")) return;
+
+  const res = await fetch(`/admin/users/${id}`, { method: "DELETE" });
+  if (res.ok) {
+    mostrarMensaje("Usuario " + id + " eliminado correctamente.");
+    await cargarUsuarios();
+    if (editingId === id) resetForm();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMensaje("Error al eliminar usuario " + id + ": " + (txt || `status ${res.status}`), true);
+  }
+}
+
+userForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const fd = new FormData();
+  fd.append("nombre_completo", document.getElementById("nombre").value.trim());
+  fd.append("usuario", document.getElementById("usuario").value.trim());
+  fd.append("email", document.getElementById("email").value.trim());
+  fd.append("role", document.getElementById("role").value);
+  fd.append("password", document.getElementById("password").value);
+
+  let url = "/admin/users";
+  let method = "POST";
+
+  if (editingId) {
+    url = `/admin/users/${editingId}`;
+    method = "POST"; // usando POST para update, como se definió en el backend
+  }
+
+  const res = await fetch(url, {
+    method,
+    body: fd
+  });
+
+  if (res.ok) {
+    mostrarMensaje(editingId ? "Usuario actualizado correctamente." : "Usuario creado correctamente.");
+    resetForm();
+    await cargarUsuarios();
+  } else {
+    const txt = await res.text().catch(() => "");
+    mostrarMensaje("Error al guardar usuario: " + (txt || `status ${res.status}`), true);
+  }
+});
+
+cargarUsuarios();
+</script>
+
+</body>
+</html>

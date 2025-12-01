@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - EcoMarket{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+    <h2>EcoMarket</h2>
+    <p>La plataforma ecológica para compartir, reciclar y reducir el impacto ambiental.</p>
+    {% if user %}
+    <p class="welcome-msg">Bienvenido a EcoMarket, <b>{{ user.nombre_completo }}</b></p>
+    {% endif %}
+</section>
+
+<!-- CATEGORÍAS -->
+<section class="categories">
+    <h2>Categorías de Reciclaje</h2>
+    <div class="category-grid">
+        <div class="category-card">
+            <h3>Plásticos</h3>
+            <a href="/products?category=Plásticos">
+                <img src="/static/images/plasticos.jpg" alt="Plásticos">
+            </a>
+        </div>
+        <div class="category-card">
+            <h3>Vidrio</h3>
+            <a href="/products?category=Vidrio">
+                <img src="/static/images/vidrio.jpg" alt="Vidrio">
+            </a>
+        </div>
+        <div class="category-card">
+            <h3>Papel</h3>
+            <a href="/products?category=Papel">
+                <img src="/static/images/papel.jpg" alt="Papel">
+            </a>
+        </div>
+        <div class="category-card">
+            <h3>Metales</h3>
+            <a href="/products?category=Metales">
+                <img src="/static/images/metal.jpg" alt="Metales">
+            </a>
+        </div>
+        <div class="category-card">
+            <h3>Electrónicos</h3>
+            <a href="/products?category=Electrónicos">
+                <img src="/static/images/electronicos.jpg" alt="Electrónicos">
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section class="benefits">
+    <h2>Reduce, Reusa y Recicla</h2>
+    <div class="benefits-container">
+        <div class="slider-container">
+            <div class="slide active">
+                <img src="/static/images/reducir.jpg" alt="Reduce">
+                <h3>Reduce</h3>
+                <p>Minimiza el impacto ambiental al disminuir el consumo innecesario de recursos.</p>
+            </div>
+            <div class="slide">
+                <img src="/static/images/reusar.jpg" alt="Reusa">
+                <h3>Reusa</h3>
+                <p>Extiende la vida útil de los productos evitando que se conviertan en residuos.</p>
+            </div>
+            <div class="slide">
+                <img src="/static/images/recicla.jpg" alt="Recicla">
+                <h3>Recicla</h3>
+                <p>Transforma materiales usados en nuevos productos y reduce la contaminación.</p>
+            </div>
+        </div>
+        <div class="benefits-image">
+            <img src="/static/images/las3r.jpg" alt="Reduce, Reusa, Recicla">
+        </div>
+    </div>
+</section>
+
+<!-- SLIDER JS -->
+<script>
+let slides = document.querySelectorAll('.slide');
+let currentSlide = 0;
+
+function showSlide(index) {
+    slides.forEach(s => s.classList.remove('active'));
+    slides[index].classList.add('active');
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}
+
+setInterval(nextSlide, 5000);
+showSlide(currentSlide);
+</script>
+
+{% endblock %}

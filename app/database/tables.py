@@ -1,6 +1,5 @@
 from datetime import datetime
 from sqlalchemy import DateTime, Float, Table, Column, Integer, String, ForeignKey
-import sqlalchemy
 from .connection import metadata
 
 users = Table(
@@ -9,9 +8,9 @@ users = Table(
     Column("id", Integer, primary_key=True),
     Column("nombre_completo", String(150), nullable=False),
     Column("usuario", String(50), unique=True),
-    Column("correo", String(100), unique=True),
-    Column("contrasena", String(255)),
-    Column("rol", String(20), default="user"),
+    Column("email", String(100), unique=True),
+    Column("password", String(255)),
+    Column("role", String(20), default="user"),
 )
 
 products = Table(
@@ -26,7 +25,7 @@ products = Table(
     Column("status", String(50), default="disponible"),
     Column("owner_id", Integer),
     Column("image_url", String(255)),
-    Column("created_at", DateTime, default=datetime.utcnow)  # corregido
+    Column("created_at", DateTime, default=datetime.utcnow),
 )
 
 clients = Table(
@@ -53,13 +52,13 @@ solicitudes = Table(
     "solicitudes",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("usuario_id", Integer, ForeignKey("users.id")),
-    Column("tipo", String(50), nullable=False),
-    Column("producto_nombre", String(100), nullable=False),
+    Column("user_id", Integer, ForeignKey("users.id")),
+    Column("producto", String(255), nullable=False),
+    Column("cantidad", Integer, nullable=False),
     Column("descripcion", String(255), nullable=True),
-    Column("estado", String(50), default="pendiente"),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    extend_existing=True  # evita error si ya está definida
+    Column("estado", String(50), default="pendiente"),  # igual que en la BD
+    # columna fecha eliminada para coincidir con la tabla real
+    Column("tipo", String(20), nullable=False),
 )
 
 points = Table(
@@ -71,3 +70,38 @@ points = Table(
     Column("lat", Float),
     Column("lng", Float),
 )
+
+from datetime import datetime
+from sqlalchemy import DateTime, Boolean  # si aún no los tienes importados
+
+user_points = Table(
+    "user_points",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
+    Column("balance", Integer, nullable=False, default=0),
+    Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
+)
+
+rewards = Table(
+    "rewards",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("nombre", String(150), nullable=False),
+    Column("descripcion", String(255)),
+    Column("puntos_necesarios", Integer, nullable=False),
+    Column("activo", Boolean, nullable=False, default=True),
+    Column("created_at", DateTime, default=datetime.utcnow),
+)
+
+points_history = Table(
+    "points_history",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
+    Column("cambio", Integer, nullable=False),  # positivo = gana; negativo = canjea
+    Column("motivo", String(150), nullable=False),
+    Column("referencia", String(100)),          # id de solicitud, etc. opcional
+    Column("fecha", DateTime, default=datetime.utcnow),
+)
+
